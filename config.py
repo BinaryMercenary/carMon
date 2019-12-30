@@ -7,9 +7,10 @@ import numpy as np
 logLength = 0
 dtc_iter = 0
 time_elapsed_since_last_action = 0
-gui_test_time = 0
 logIter = 1
 ecuReady = False
+##GUI Test
+gui_test_time = 5000
 #debugFlag = False
 debugFlag = True
 settingsFlag = False

@@ -60,8 +60,8 @@ log.createLog(["TIME", "RPM", "SPEED", "COOLANT_TEMP", "INTAKE_TEMP", "MAF", "TH
 # Debug: Instead of reading from the ECU, read from a log file.
 if config.debugFlag:
     #Read the log file into memory.
-    ##ktb##  list = log.readLog('/home/pi/logs/debug_log.csv')
-    list = log.readLog('/logs/debug_log.csv')
+    list = log.readLog('/home/pi/carMon/debug/debug_log.csv')
+    ##list = log.readLog('/logs/debug_log.csv')
     # Get the length of the log.
     logLength = len(list)
 
@@ -159,6 +159,7 @@ while True:
     config.gui_test_time += dt
 
     # We only want to log once a second.
+    ##ktb this 1000 value should probably get set in config, in case sparser logs are wanted
     if config.time_elapsed_since_last_action > 1000:
       #Log all of our data.
       data = [datetime.datetime.today().strftime('%Y%m%d%H%M%S'), ecu.rpm, ecu.speed, ecu.coolantTemp, ecu.intakeTemp, ecu.MAF, ecu.throttlePosition, ecu.engineLoad]
