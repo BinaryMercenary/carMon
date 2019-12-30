@@ -60,6 +60,7 @@ log.createLog(["TIME", "RPM", "SPEED", "COOLANT_TEMP", "INTAKE_TEMP", "MAF", "TH
 # Debug: Instead of reading from the ECU, read from a log file.
 if config.debugFlag:
     #Read the log file into memory.
+    ##ktb##  list = log.readLog('/home/pi/logs/debug_log.csv')
     list = log.readLog('/logs/debug_log.csv')
     # Get the length of the log.
     logLength = len(list)

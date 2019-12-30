@@ -11,8 +11,8 @@ gui_test_time = 0
 logIter = 1
 ecuReady = False
 debugFlag = False
+#debugFlag = True
 settingsFlag = False
-#ktb attn to piTFT = False #instead, maybe
 piTFT = True
 startTime = datetime.datetime.today().strftime('%Y%m%d%H%M%S')
 #ktb attn to piTFT RESOLUTION

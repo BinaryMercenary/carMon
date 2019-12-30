@@ -18,7 +18,7 @@ def updateLog(data):
 # Function to close the log and rename it to include end time.
 def closeLog():
   endTime = datetime.datetime.today().strftime('%Y%m%d%H%M%S')
-  os.rename('home/pi/logs/' + startTime + '.csv', 'logs/' + startTime + "_" + endTime + '.csv')
+  os.rename('/home/pi/logs/' + startTime + '.csv', '/home/pi/logs/' + startTime + "_" + endTime + '.csv')
 
 # Debug function to read from log file for GUI testing.
 def readLog(logFile):
@@ -27,28 +27,28 @@ def readLog(logFile):
     logList = list(reader)
   return logList
 
-### 	# Debug function that reads from log file and assigns to global values.
-### 	def getLogValues(logFile):
-### 	  global logIter
-### 	  global rpm
-### 	  global speed
-### 	  global coolantTemp
-### 	  global intakeTemp
-### 	  global MAF
-### 	  global throttlePosition
-### 	  global engineLoad
-### 	  rpm = int(logFile[logIter][1])
-### 	  speed = int(logFile[logIter][2])
-### 	  coolantTemp = logFile[logIter][3]
-### 	  intakeTemp = logFile[logIter][4]
-### 	  MAF = logFile[logIter][5]
-### 	  # Cludgy fix for issue where MAF was logged as really log float, causing clipping when displayed on GUI.
-### 	  MAF = format(float(MAF), '.2f')
-### 	  throttlePosition = logFile[logIter][6]
-### 	  engineLoad = logFile[logIter][7]
-### 	  logIter += 1
-### 	  # Reset iterator.
-### 	  if logIter == logLength
-#### 	    logIter = 1
-### 	# I'm assuming this line above is needed, but I still get a syntax error :( - skipping this def
+# Debug function that reads from log file and assigns to global values.
+def getLogValues(logFile):
+  global logIter
+  global rpm
+  global speed
+  global coolantTemp
+  global intakeTemp
+  global MAF
+  global throttlePosition
+  global engineLoad
+  rpm = int(logFile[logIter][1])
+  speed = int(logFile[logIter][2])
+  coolantTemp = logFile[logIter][3]
+  intakeTemp = logFile[logIter][4]
+  MAF = logFile[logIter][5]
+  # Cludgy fix for issue where MAF was logged as really log float, causing clipping when displayed on GUI.
+  MAF = format(float(MAF), '.2f')
+  throttlePosition = logFile[logIter][6]
+  engineLoad = logFile[logIter][7]
+  logIter += 1
+  # Reset iterator.
+  if logIter == logLength:
+    logIter = 1
+# I'm assuming this line above is needed, but I still get a syntax error :( - skipping this def
 
