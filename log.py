@@ -50,5 +50,4 @@ def getLogValues(logFile):
   # Reset iterator.
   if logIter == logLength:
     logIter = 1
-# I'm assuming this line above is needed, but I still get a syntax error :( - skipping this def
 
