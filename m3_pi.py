@@ -181,7 +181,7 @@ while True:
              log.closeLog()
              pygame.quit()
              sys.exit()
-          # ktb set conditions to run ecu connect AFTER debug is so desired
+          # ktb set conditions to run ecu connect AFTER debug if so desired
           if not config.exitOnDebug and not config.debugFlag:
              config.ecuReady = False
           ##dbg
