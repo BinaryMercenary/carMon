@@ -92,6 +92,22 @@ while True:
     # Clear the screen
     windowSurface.fill(config.BLACK)
 
+    ## ktb this will be a whole new module, dtc.py with def parseDTCs(list,list)
+    #probably a 3d array paged by gray, yellow, red, or 2d with 0123 values
+    ##all this logic is for test only:
+    #if config.dtc_inc = 4 and (config.gui_test_time > config.dbg_rate):
+    if config.dtc_inc == 4:
+      img = pygame.image.load("/home/pi/images/logo-1111.png")
+      ##logo-1110.png
+      ##logo-1100.png
+      ##logo-1000.png
+      #config.dtc_pending == 0
+      ##images/logo-2100.png
+      #config.dtc_error == 0
+      ##logo-3100.png
+      ##logo-3000.png
+      ###add logic handler here for 3xxx state to check for *ONLY* P0440 in config.dtc or ecu.xxx AND THEN auto clear
+
     # Load the M3 logo
     windowSurface.blit(img, (windowSurface.get_rect().centerx - 105, windowSurface.get_rect().centery + 60))
     # If the settings button has been pressed:
@@ -176,6 +192,7 @@ while True:
           ecu.MAF =  config.lcd[5]
           ecu.throttlePosition =  config.lcd[6]
           ecu.engineLoad =  config.lcd[7]
+          ##ktb I will want to log the timing value for my next engine mods...
           #ecu.timingAdvance =  config.lcd[8]
           #ecu.dtc = None
           ecu.calcGear(ecu.rpm, ecu.speed)
@@ -206,4 +223,5 @@ while True:
       config.time_elapsed_since_last_action = 0
     # draw the window onto the screen
     pygame.display.update()
+
 
