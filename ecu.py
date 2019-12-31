@@ -17,10 +17,17 @@ tach_iter = 0
 gear = 0
 connection = None
 dtc = None
+rpm_gauge = 0
 
 # Function to figure out what tach image we should display based on the RPM.
 def getTach():
   global tach_iter
+  print "###########################################"
+  print config.redline_rpm
+  rpm_gauge = config.redline_rpm // config.rpm_grads
+  print rpm_gauge
+  print config.rpm_weight
+  print "###########################################"
   if rpm == 0:
     tach_iter = 0
   elif (rpm >= 0) & (rpm < 200):

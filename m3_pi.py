@@ -27,7 +27,7 @@ if not config.debugFlag:
 
 # Load all of our tach images into an array so we can easily access them.
 background_dir = 'tach/'
-background_files = ['%i.png' % i for i in range(0, 42)]
+background_files = ['%i.png' % i for i in range(0, config.rpm_grads)]
 ground = [pygame.image.load(os.path.join("/home/pi/tach/", file)) for file in background_files]
 
 # Load the M3 PI image.
@@ -155,6 +155,9 @@ while True:
              log.closeLog()
              pygame.quit()
              sys.exit()
+          # ktb set conditions to run ecu connect AFTER debug is so desired
+          if not config.exitOnDebug and not config.debugFlag:
+             config.ecuReady = False
           ##dbg
           ecu.rpm = config.lcd[1]
           ecu.speed = config.lcd[2]
