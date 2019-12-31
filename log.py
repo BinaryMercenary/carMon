@@ -1,6 +1,7 @@
 #!/usr/bin/python
 import csv, os
 from config import *
+##import config
 
 #Function to create a csv with the specified header.
 def createLog(header):
@@ -28,7 +29,7 @@ def readLog(logFile):
   return logList
 
 # Debug function that reads from log file and assigns to global values.
-def getLogValues(logFile):
+def getLogValues(logFile,logLength):
   global logIter
   global rpm
   global speed
@@ -46,9 +47,29 @@ def getLogValues(logFile):
   MAF = format(float(MAF), '.2f')
   throttlePosition = logFile[logIter][6]
   engineLoad = logFile[logIter][7]
+  ### debug [
+  print "------"
+  print logLength
+  print logIter
+  print "---"
+  print rpm
+  print speed
+  print coolantTemp
+  print intakeTemp
+  print MAF
+  print throttlePosition
+  print engineLoad
+  ### ] debug
+  lcd[0] = logLength - logIter - 1
+  lcd[1] = rpm
+  lcd[2] = speed
+  lcd[3] = coolantTemp
+  lcd[4] = intakeTemp
+  lcd[5] = MAF
+  lcd[6] = throttlePosition
+  lcd[7] = engineLoad
   logIter += 1
   # Reset iterator.
   if logIter == logLength:
     logIter = 1
-# I'm assuming this line above is needed, but I still get a syntax error :( - skipping this def
-
+  return lcd

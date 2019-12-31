@@ -60,8 +60,8 @@ log.createLog(["TIME", "RPM", "SPEED", "COOLANT_TEMP", "INTAKE_TEMP", "MAF", "TH
 # Debug: Instead of reading from the ECU, read from a log file.
 if config.debugFlag:
     #Read the log file into memory.
-    ##ktb##  list = log.readLog('/home/pi/logs/debug_log.csv')
-    list = log.readLog('/logs/debug_log.csv')
+    list = log.readLog('/home/pi/carMon/debug/debug_log.csv')
+    ##list = log.readLog('/logs/debug_log.csv')
     # Get the length of the log.
     logLength = len(list)
 
@@ -83,7 +83,7 @@ while True:
       #Figure out what tach image should be.
       ecu.getTach()
 
-      # Figure out what gear we 're *theoretically* in.
+      # Figure out what gear we're *theoretically* in.
       ecu.calcGear(int(float(ecu.rpm)), int(ecu.speed))
 
     # Clear the screen
@@ -146,11 +146,37 @@ while True:
       # If debug flag is set, feed fake data so we can test the GUI.
       if config.debugFlag:
         #Debug gui display refresh 10 times a second.
-        if config.gui_test_time > 500:
-          log.getLogValues(list)
+        if config.gui_test_time > config.dbg_rate:
+          config.lcd = log.getLogValues(list,logLength)
+          config.debugFlag = config.lcd[0]
+          #log.getLogValues(list,logLength)
+          # Closes after showing all debug values IF config.exitOnDebug is true
+          if config.exitOnDebug and not config.debugFlag:
+             log.closeLog()
+             pygame.quit()
+             sys.exit()
+          #config.debugFlag = this plus or times that # noting false is 0, true is 1 or greater
+          ##dbg
+          ecu.rpm = config.lcd[1]
+          ecu.speed = config.lcd[2]
+          ecu.coolantTemp =  config.lcd[3]
+          ecu.intakeTemp =  config.lcd[4]
+          ecu.MAF =  config.lcd[5]
+          ecu.throttlePosition =  config.lcd[6]
+          ecu.engineLoad =  config.lcd[7]
+          #ecu.timingAdvance =  config.lcd[8]
+          #ecu.dtc = None
           ecu.calcGear(ecu.rpm, ecu.speed)
           ecu.getTach()
+          print "< Tracking realtime variance during debug:"
+          ###print config.logIter
+          ###print logLength
+          print config.gui_test_time
+	  print ">"
           config.gui_test_time = 0
+          if config.dbg_rate == 0:
+            config.dbg_rate = config.log_rate // (logLength + 1)
+          print config.dbg_rate
 
     # Update the clock.
     dt = clock.tick()
@@ -158,8 +184,8 @@ while True:
     config.time_elapsed_since_last_action += dt
     config.gui_test_time += dt
 
-    # We only want to log once a second.
-    if config.time_elapsed_since_last_action > 1000:
+    # Do logs per the specified asynch interval
+    if config.time_elapsed_since_last_action > config.log_rate:
       #Log all of our data.
       data = [datetime.datetime.today().strftime('%Y%m%d%H%M%S'), ecu.rpm, ecu.speed, ecu.coolantTemp, ecu.intakeTemp, ecu.MAF, ecu.throttlePosition, ecu.engineLoad]
       log.updateLog(data)
