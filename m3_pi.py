@@ -17,7 +17,7 @@ def drawText(string, x, y, font):
   textRect.centery = windowSurface.get_rect().centery + y
   windowSurface.blit(text, textRect)
 
-# Connect to the ECU and GPS.
+# Connect to the ECU.
 if not config.debugFlag:
     ecu.ecuThread()
 
@@ -155,7 +155,6 @@ while True:
              log.closeLog()
              pygame.quit()
              sys.exit()
-          #config.debugFlag = this plus or times that # noting false is 0, true is 1 or greater
           ##dbg
           ecu.rpm = config.lcd[1]
           ecu.speed = config.lcd[2]
@@ -177,6 +176,7 @@ while True:
           if config.dbg_rate == 0:
             config.dbg_rate = config.log_rate // (logLength + 1)
           print config.dbg_rate
+          print config.debugFlag 
 
     # Update the clock.
     dt = clock.tick()

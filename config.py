@@ -14,6 +14,7 @@ gui_test_time = 0
 logIter = 1
 
 ## Inits to other
+splash_rate = 2500
 log_rate = 1000
 dbg_rate = 0
 ## change the above dbg value for faster/slower playback
@@ -24,7 +25,7 @@ dbg_rate = 0
 #debugFlag = False
 #exitOnDebug = False
 
-## Do debug and persist (i.e., splash)
+## Do debug and persist (i.e., live demo)
 debugFlag = True
 exitOnDebug = False
 
