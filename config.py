@@ -14,6 +14,12 @@ gui_test_time = 0
 logIter = 1
 
 ## Inits to other
+## This doesn't have to be 50, as there are only 0-42 graduations,
+## but higher value will have flash effect, especially with a padded rpm value
+rpm_grads = 50
+redline_rpm = 6250
+rpm_weight = redline_rpm // rpm_grads
+#splash_img = "b2f-480x320.png"
 splash_rate = 2500
 log_rate = 1000
 dbg_rate = 0
@@ -47,6 +53,11 @@ piTFT = True
 
 #Strings
 startTime = datetime.datetime.today().strftime('%Y%m%d%H%M%S')
+
+#init to int 0, too:
+dtc_inc = 0
+dtc_pending = 0
+dtc_error = 0
 
 #lists
 dtc = []

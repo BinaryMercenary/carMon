@@ -27,12 +27,15 @@ if not config.debugFlag:
 
 # Load all of our tach images into an array so we can easily access them.
 background_dir = 'tach/'
-background_files = ['%i.png' % i for i in range(0, 42)]
+background_files = ['%i.png' % i for i in range(0, config.rpm_grads + 1)]
 ground = [pygame.image.load(os.path.join("/home/pi/tach/", file)) for file in background_files]
 
 # Load the M3 PI image.
 img = pygame.image.load("/home/pi/images/m3_logo.png")
 img_button = img.get_rect(topleft = (135, 220))
+
+# Load the M3 PI image.
+splasher = pygame.image.load("/home/pi/images/b2f-480x320.png")
 
 # Set up the window.If piTFT flag is set, set up the window for the screen.Else create it normally for use on normal monitor.
 if config.piTFT:
@@ -89,6 +92,22 @@ while True:
     # Clear the screen
     windowSurface.fill(config.BLACK)
 
+    ## ktb this will be a whole new module, dtc.py with def parseDTCs(list,list)
+    #probably a 3d array paged by gray, yellow, red, or 2d with 0123 values
+    ##all this logic is for test only:
+    #if config.dtc_inc = 4 and (config.gui_test_time > config.dbg_rate):
+    if config.dtc_inc == 4:
+      img = pygame.image.load("/home/pi/images/logo-1111.png")
+      ##logo-1110.png
+      ##logo-1100.png
+      ##logo-1000.png
+      #config.dtc_pending == 0
+      ##images/logo-2100.png
+      #config.dtc_error == 0
+      ##logo-3100.png
+      ##logo-3000.png
+      ###add logic handler here for 3xxx state to check for *ONLY* P0440 in config.dtc or ecu.xxx AND THEN auto clear
+
     # Load the M3 logo
     windowSurface.blit(img, (windowSurface.get_rect().centerx - 105, windowSurface.get_rect().centery + 60))
     # If the settings button has been pressed:
@@ -102,13 +121,20 @@ while True:
           if dtc_iter == len(dtc):
             dtc_iter = 0
       else :
-        drawText("No DTCs found", 0, -80, "label")
+        windowSurface.blit(splasher, (0,0))
+        drawText("No DTCs found", 140, 140, "label")
     else :
-      #Calculate coordinates so tachometer is in middle of screen.
+      #Calculate coordinates so tachometer is in middle of screen. (gross)
       coords = (windowSurface.get_rect().centerx - 200, windowSurface.get_rect().centery - 200)
 
       # Load the tach image
-      windowSurface.blit(ground[ecu.tach_iter], coords)
+      if ecu.tach_iter >= 0:
+        windowSurface.blit(ground[ecu.tach_iter], coords)
+      if ecu.tach_iter < 0:
+        print "WARNING - negative RPMs are reserved for dark matter engines"
+        #let's do something else fun here some other time
+        #windowSurface.blit(splasher, (0,0))
+        #time.sleep(2.5)
 
       # Draw the RPM readout and label.
       drawText(str(ecu.rpm), 0, 0, "readout")
@@ -155,6 +181,9 @@ while True:
              log.closeLog()
              pygame.quit()
              sys.exit()
+          # ktb set conditions to run ecu connect AFTER debug if so desired
+          if not config.exitOnDebug and not config.debugFlag:
+             config.ecuReady = False
           ##dbg
           ecu.rpm = config.lcd[1]
           ecu.speed = config.lcd[2]
@@ -163,6 +192,7 @@ while True:
           ecu.MAF =  config.lcd[5]
           ecu.throttlePosition =  config.lcd[6]
           ecu.engineLoad =  config.lcd[7]
+          ##ktb I will want to log the timing value for my next engine mods...
           #ecu.timingAdvance =  config.lcd[8]
           #ecu.dtc = None
           ecu.calcGear(ecu.rpm, ecu.speed)
@@ -171,12 +201,12 @@ while True:
           ###print config.logIter
           ###print logLength
           print config.gui_test_time
-	  print ">"
+          print ">"
           config.gui_test_time = 0
           if config.dbg_rate == 0:
             config.dbg_rate = config.log_rate // (logLength + 1)
           print config.dbg_rate
-          print config.debugFlag 
+          print config.debugFlag
 
     # Update the clock.
     dt = clock.tick()
@@ -193,3 +223,5 @@ while True:
       config.time_elapsed_since_last_action = 0
     # draw the window onto the screen
     pygame.display.update()
+
+
