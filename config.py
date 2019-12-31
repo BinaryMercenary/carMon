@@ -17,6 +17,7 @@ logIter = 1
 rpm_grads = 50
 redline_rpm = 6250
 rpm_weight = redline_rpm // rpm_grads
+splash_img = "b2f-480x320.png"
 splash_rate = 2500
 log_rate = 1000
 dbg_rate = 0

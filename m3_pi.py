@@ -27,12 +27,15 @@ if not config.debugFlag:
 
 # Load all of our tach images into an array so we can easily access them.
 background_dir = 'tach/'
-background_files = ['%i.png' % i for i in range(0, config.rpm_grads)]
+background_files = ['%i.png' % i for i in range(0, config.rpm_grads + 1)]
 ground = [pygame.image.load(os.path.join("/home/pi/tach/", file)) for file in background_files]
 
 # Load the M3 PI image.
 img = pygame.image.load("/home/pi/images/m3_logo.png")
 img_button = img.get_rect(topleft = (135, 220))
+
+# Load the M3 PI image.
+splasher = pygame.image.load("/home/pi/images/b2f-480x320.png")
 
 # Set up the window.If piTFT flag is set, set up the window for the screen.Else create it normally for use on normal monitor.
 if config.piTFT:
@@ -102,13 +105,20 @@ while True:
           if dtc_iter == len(dtc):
             dtc_iter = 0
       else :
-        drawText("No DTCs found", 0, -80, "label")
+        windowSurface.blit(splasher, (0,0))
+        drawText("No DTCs found", 140, 140, "label")
     else :
-      #Calculate coordinates so tachometer is in middle of screen.
+      #Calculate coordinates so tachometer is in middle of screen. (gross)
       coords = (windowSurface.get_rect().centerx - 200, windowSurface.get_rect().centery - 200)
 
       # Load the tach image
-      windowSurface.blit(ground[ecu.tach_iter], coords)
+      if ecu.tach_iter >= 0:
+        windowSurface.blit(ground[ecu.tach_iter], coords)
+      if ecu.tach_iter < 0:
+        print "WARNING - negative RPMs are reserved for dark matter engines"
+        #let's do something else fun here some other time
+        #windowSurface.blit(splasher, (0,0))
+        #time.sleep(2.5)
 
       # Draw the RPM readout and label.
       drawText(str(ecu.rpm), 0, 0, "readout")
@@ -174,12 +184,12 @@ while True:
           ###print config.logIter
           ###print logLength
           print config.gui_test_time
-	  print ">"
+          print ">"
           config.gui_test_time = 0
           if config.dbg_rate == 0:
             config.dbg_rate = config.log_rate // (logLength + 1)
           print config.dbg_rate
-          print config.debugFlag 
+          print config.debugFlag
 
     # Update the clock.
     dt = clock.tick()
@@ -196,3 +206,4 @@ while True:
       config.time_elapsed_since_last_action = 0
     # draw the window onto the screen
     pygame.display.update()
+
