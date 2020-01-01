@@ -5,6 +5,8 @@ import obd
 import numpy as np
 
 # Globals
+clearDTC = "DTC not cleared"
+pending = "P9999"
 rpm = 0
 speed = 0
 coolantTemp = 0
@@ -82,13 +84,32 @@ class ecuThread(Thread):
     connection.watch(obd.commands.MAF, callback=self.new_MAF)
     connection.watch(obd.commands.THROTTLE_POS, callback=self.new_throttle_position)
     connection.watch(obd.commands.ENGINE_LOAD, callback=self.new_engine_load)
+    ## if deepscan: #... no need to run DTC checks every cycle ... kt
     connection.watch(obd.commands.GET_DTC, callback=self.new_dtc)
-
+    connection.watch(obd.commands.GET_CURRENT_DTC, callback=self.new_pending)
+    #connection.watch(obd.commands. for Incomplete monitors - tbd ktb
+    
+    ## ktb - would it be safer to clear this at idle/acc mode (only)???
+    if autoclearSDTC and currentdtc  == selectdtc:
+      print "MEGA-MONKEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE  - log this pls -  ktb"
+      print clearDTC
+      connection.watch(obd.commands.CLEAR_DTC, callback=self.new_clearDTC)
+      print clearDTC
     # Start the connection.
     connection.start()
 
     # Set the ready flag so we can boot the GUI.
     config.ecuReady = True
+
+  def new_pending(self, r):
+    global pending
+    pending = r
+    print pending
+
+  def new_clearDTC(self, r):
+    global clearDTC
+    clearDTC = r
+    print clearDTC
 
   def new_rpm(self, r):
     global rpm

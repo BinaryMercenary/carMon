@@ -51,6 +51,9 @@ settingsFlag = False
 ## Inits to True (when piTFT is used)
 piTFT = True
 
+##AutoClear Select DTC:
+autoclearSDTC = True
+
 #Strings
 startTime = datetime.datetime.today().strftime('%Y%m%d%H%M%S')
 
@@ -60,9 +63,9 @@ dtc_pending = 0
 dtc_error = 0
 
 #lists
-dtc = []
-#dtc = ["P0440"]
-#dtc = ["P0440", "P0446"]
+currentdtc = []
+selectdtc = ["P0440"]
+#selectdtc = ["P0440", "P0446"]
 lcd = [0,0,0,0,0,0.11,0,0]
 
 ### ktb attn to piTFT RESOLUTION
