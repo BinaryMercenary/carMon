@@ -61,7 +61,7 @@ clock = pygame.time.Clock()
 log.createLog(["TIME", "RPM", "SPEED", "COOLANT_TEMP", "INTAKE_TEMP", "MAF", "THROTTLE_POS", "ENGINE_LOAD"])
 
 # Debug: Instead of reading from the ECU, read from a log file.
-if config.debugFlag:
+if  config.debugFlag:
     #Read the log file into memory.
     list = log.readLog('/home/pi/carMon/debug/debug_log.csv')
     ##list = log.readLog('/logs/debug_log.csv')
@@ -81,6 +81,8 @@ while True:
       if event.type == MOUSEBUTTONDOWN:
         #Toggle the settings flag when the screen is touched.
         config.settingsFlag = not config.settingsFlag
+        # kb events splash mode -- will playback the log file again
+        config.debugFlag = True
 
     if not config.debugFlag:
       #Figure out what tach image should be.
@@ -183,7 +185,10 @@ while True:
              sys.exit()
           # ktb set conditions to run ecu connect AFTER debug if so desired
           if not config.exitOnDebug and not config.debugFlag:
-             config.ecuReady = False
+             # T/T plays debug forever # ktb
+             config.debugFlag = False
+             # ktb ktb toggled
+             config.ecuReady = True
           ##dbg
           ecu.rpm = config.lcd[1]
           ecu.speed = config.lcd[2]
@@ -223,5 +228,6 @@ while True:
       config.time_elapsed_since_last_action = 0
     # draw the window onto the screen
     pygame.display.update()
+
 
 
