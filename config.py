@@ -60,9 +60,9 @@ autoclearSDTC = True
 startTime = datetime.datetime.today().strftime('%Y%m%d%H%M%S')
 
 #init to int 0, too:
-dtc_inc = 0
-dtc_pending = 0
 dtc_error = 0
+dtc_pending = 0
+dtc_inc = 0 
 
 #lists
 currentdtc = []

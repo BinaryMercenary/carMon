@@ -4,6 +4,9 @@ import config, ecu, log, time, datetime, sys
 import pygame, time, os, csv
 from pygame.locals import *
 
+#this is part of the repo and there for NOT in config
+imgdir = "/home/pi/images/"
+
 #Helper function to draw the given string at coordinate x, y, relative to center.
 def drawText(string, x, y, font):
   if font == "readout":
@@ -31,7 +34,10 @@ background_files = ['%i.png' % i for i in range(0, config.rpm_grads + 1)]
 ground = [pygame.image.load(os.path.join("/home/pi/tach/", file)) for file in background_files]
 
 # Load the M3 PI image.
-img = pygame.image.load("/home/pi/images/m3_logo.png")
+try:
+    img = pygame.image.load(imgdir + "logo-"  + str(config.dtc_error)  + str(config.dtc_pending)  + str(config.dtc_inc) + ".png")
+except pygame.error:
+    img = pygame.image.load(imgdir + "logo-330.png")
 img_button = img.get_rect(topleft = (135, 220))
 
 # Load the M3 PI image.
@@ -47,9 +53,9 @@ else :
     windowSurface = pygame.display.set_mode(config.RESOLUTION, 0, 32)
 
 # Set up fonts
-readoutFont = pygame.font.Font("/home/pi/font/ASL_light.ttf", 40)
-labelFont = pygame.font.Font("/home/pi/font/ASL_light.ttf", 30)
-fpsFont = pygame.font.Font("/home/pi/font/ASL_light.ttf", 20)
+readoutFont = pygame.font.Font("/home/pi/carMon/fonts/TitilliumWeb-Light.ttf", 40)
+labelFont = pygame.font.Font("/home/pi/carMon/fonts/TitilliumWeb-Light.ttf", 30)
+fpsFont = pygame.font.Font("/home/pi/carMon/fonts/TitilliumWeb-Light.ttf", 20)
 
 # Set the caption.
 pygame.display.set_caption('M3 PI')
