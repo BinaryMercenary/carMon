@@ -63,6 +63,7 @@ startTime = datetime.datetime.today().strftime('%Y%m%d%H%M%S')
 dtc_error = 0
 dtc_pending = 0
 dtc_inc = 0 
+#dtc_inc = 4 
 
 #lists
 currentdtc = []
@@ -84,5 +85,5 @@ speedArr = np.array([[4, 7, 10, 14, 17], [5, 9, 14, 18, 23], [7, 11, 17, 23, 28]
 # List of RPM values for above LUT.
 rpmList = np.array([750, 1000, 1250, 1500, 1750, 2000, 2250, 2500, 2750, 3000, 3250,3500, 3750, 4000, 4250, 4500, 4750, 5000, 5250, 5500, 5750, 6000, 6250, 6500, 6750,7000])
 
-# A Duty cycle LUT will be needed here for an active transcooler
+## A Duty cycle LUT will be needed here for an active transcooler
 

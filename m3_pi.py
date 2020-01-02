@@ -5,7 +5,7 @@ import pygame, time, os, csv
 from pygame.locals import *
 
 #this is part of the repo and there for NOT in config
-imgdir = "/home/pi/images/"
+imgdir = "/home/pi/carMon/images/"
 
 #Helper function to draw the given string at coordinate x, y, relative to center.
 def drawText(string, x, y, font):
@@ -31,7 +31,7 @@ if not config.debugFlag:
 # Load all of our tach images into an array so we can easily access them.
 background_dir = 'tach/'
 background_files = ['%i.png' % i for i in range(0, config.rpm_grads + 1)]
-ground = [pygame.image.load(os.path.join("/home/pi/tach/", file)) for file in background_files]
+ground = [pygame.image.load(os.path.join("/home/pi/carMon/images/", file)) for file in background_files]
 
 # Load the M3 PI image.
 try:
@@ -41,7 +41,7 @@ except pygame.error:
 img_button = img.get_rect(topleft = (135, 220))
 
 # Load the M3 PI image.
-splasher = pygame.image.load("/home/pi/images/b2f-480x320.png")
+splasher = pygame.image.load("/home/pi/carMon/images/b2f-480x320.png")
 
 # Set up the window.If piTFT flag is set, set up the window for the screen.Else create it normally for use on normal monitor.
 if config.piTFT:
@@ -103,18 +103,6 @@ while True:
     ## ktb this will be a whole new module, dtc.py with def parseDTCs(list,list)
     #probably a 3d array paged by gray, yellow, red, or 2d with 0123 values
     ##all this logic is for test only:
-    #if config.dtc_inc = 4 and (config.gui_test_time > config.dbg_rate):
-    if config.dtc_inc == 4:
-      img = pygame.image.load("/home/pi/images/logo-1111.png")
-      ##logo-1110.png
-      ##logo-1100.png
-      ##logo-1000.png
-      #config.dtc_pending == 0
-      ##images/logo-2100.png
-      #config.dtc_error == 0
-      ##logo-3100.png
-      ##logo-3000.png
-      ###add logic handler here for 3xxx state to check for *ONLY* P0440 in config.dtc or ecu.xxx AND THEN auto clear
 
     # Load the M3 logo
     windowSurface.blit(img, (windowSurface.get_rect().centerx - 105, windowSurface.get_rect().centery + 60))
