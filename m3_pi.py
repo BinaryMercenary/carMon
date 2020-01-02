@@ -100,7 +100,7 @@ while True:
     # Clear the screen
     windowSurface.fill(config.BLACK)
 
-    ## ktb this will be a whole new module, dtc.py with def parseDTCs(list,list)
+    ## ktb2 this will be a whole new module, dtc.py with def parseDTCs(list,list)
     #probably a 3d array paged by gray, yellow, red, or 2d with 0123 values
     ##all this logic is for test only:
 
@@ -177,11 +177,11 @@ while True:
              log.closeLog()
              pygame.quit()
              sys.exit()
-          # ktb set conditions to run ecu connect AFTER debug if so desired
+          # ktb2 set conditions to run ecu connect AFTER debug if so desired
           if not config.exitOnDebug and not config.debugFlag:
-             # T/T plays debug forever # ktb
+             # T/T plays debug forever # ktb2
              config.debugFlag = False
-             # ktb ktb toggled
+             # ktb2 ktb2 toggled
              config.ecuReady = True
           ##dbg
           ecu.rpm = config.lcd[1]
@@ -191,8 +191,9 @@ while True:
           ecu.MAF =  config.lcd[5]
           ecu.throttlePosition =  config.lcd[6]
           ecu.engineLoad =  config.lcd[7]
-          ##ktb I will want to log the timing value for my next engine mods...
-          #ecu.timingAdvance =  config.lcd[8]
+          ecu.timingAdvance = config.lcd[8]
+          ecu.transmissionTemp = config.lcd[9]
+          ##ktb keep an eye on this during testing
           #ecu.dtc = None
           ecu.calcGear(ecu.rpm, ecu.speed)
           ecu.getTach()
@@ -216,12 +217,17 @@ while True:
     # Do logs per the specified asynch interval
     if config.time_elapsed_since_last_action > config.log_rate:
       #Log all of our data.
-      data = [datetime.datetime.today().strftime('%Y%m%d%H%M%S'), ecu.rpm, ecu.speed, ecu.coolantTemp, ecu.intakeTemp, ecu.MAF, ecu.throttlePosition, ecu.engineLoad]
-      log.updateLog(data)
+      config.disposition = config.disposition.replace(',', '')
+      data = [datetime.datetime.today().strftime('%Y%m%d%H%M%S'), ecu.rpm, ecu.speed, ecu.coolantTemp, ecu.intakeTemp, ecu.MAF, ecu.throttlePosition, ecu.engineLoad, config.disposition]
+      ##this mechanism may be self-defeated above, BUT a good placeholder
+      if not config.debugFlag:
+        log.updateLog(data)
       # Reset time.
       config.time_elapsed_since_last_action = 0
     # draw the window onto the screen
     pygame.display.update()
+
+
 
 
 

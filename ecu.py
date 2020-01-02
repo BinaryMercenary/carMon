@@ -78,6 +78,7 @@ class ecuThread(Thread):
     connection = obd.Async("/dev/ttyUSB0", 115200, "3", fast=False)
 
     # Watch everything we care about.
+    ## what happens of we "Care" too much?  M-VCI even warns 5 param... ktb3 to test reduced list pls
     connection.watch(obd.commands.RPM, callback=self.new_rpm)
     connection.watch(obd.commands.SPEED, callback=self.new_speed)
     connection.watch(obd.commands.COOLANT_TEMP, callback=self.new_coolant_temp)
@@ -85,24 +86,31 @@ class ecuThread(Thread):
     connection.watch(obd.commands.MAF, callback=self.new_MAF)
     connection.watch(obd.commands.THROTTLE_POS, callback=self.new_throttle_position)
     connection.watch(obd.commands.ENGINE_LOAD, callback=self.new_engine_load)
+    connection.watch(obd.commands.TIMING_ADVANCE, callback=self.new_timing_advance)
+
     if printCommands:
+      config.disposition = "ATTN: Commands fetched"
       printCommands = False
       print "ecu.py printing 0100 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
       connection.watch(obd.print_commands, callback=self.new_commandsReturn)
-    ## if deepscan: #... no need to run DTC checks every cycle ... ktb
+    ## if deepscan: #... no need to run DTC checks every cycle ... ktb2
     connection.watch(obd.commands.GET_DTC, callback=self.new_dtc)
     connection.watch(obd.commands.GET_CURRENT_DTC, callback=self.new_pending)
-    #connection.watch(obd.commands. for Incomplete monitors - tbd ktb
+    #connection.watch(obd.commands. for Incomplete monitors - tbd ktb2
     
-    ## ktb - would it be safer to clear this at idle/acc mode (only)???
-    if autoclearSDTC and currentdtc  == selectdtc:
-      print "log these resets, pls - ktb - >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
+    ## ktb2 - would it be safer to clear this at idle/acc mode (only)???
+    #config.autoclearSDTC = True
+    #config.currentdtc = [""]
+    #config.selectdtc  = [""]
+    if config.autoclearSDTC and (config.currentdtc  == config.selectdtc):
+      config.disposition = "ATTN: DTC cleared"
+      print "log these resets, pls - ktb2 - >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
       print clearDTC
       print " ^^^^ un-init value"
       connection.watch(obd.commands.CLEAR_DTC, callback=self.new_clearDTC)
       print " vvvv populated value"
       print clearDTC
-      print "log these resets, pls - ktb - <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"
+      print "log these resets, pls - ktb2 - <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"
 
     # Start the connection.
     connection.start()
@@ -113,19 +121,19 @@ class ecuThread(Thread):
   def new_commandsReturn(self, r):
     global commandsReturn
     commandsReturn = r
-    print "ktb tbd output type/format FOR GET~ALL - >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
+    print "ktb2 tbd output type/format FOR GET~ALL - >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
     print commandsReturn
 
   def new_pending(self, r):
     global pending
     pending = r
-    print "ktb tbd output type/format FOR PENDING - >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
+    print "ktb2 tbd output type/format FOR PENDING - >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
     print pending
 
   def new_clearDTC(self, r):
     global clearDTC
     clearDTC = r
-    print "ktb tbd output type/format FOR clearDTC - >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
+    print "ktb2 tbd output type/format FOR clearDTC - >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
     print clearDTC
 
   def new_rpm(self, r):
@@ -164,5 +172,4 @@ class ecuThread(Thread):
   def new_dtc(self, r):
     global dtc
     dtc = r.value
-
 

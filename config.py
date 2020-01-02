@@ -25,6 +25,7 @@ log_rate = 1000
 dbg_rate = 0
 ## change the above dbg value for faster/slower playback
 ## otherwise, it is log_rate // logLength
+disposition = "Feet stuck, can't move"
 
 #### <Debug flag pairs
 ## Normal mode
@@ -69,9 +70,9 @@ dtc_inc = 0
 currentdtc = []
 selectdtc = ["P0440"]
 #selectdtc = ["P0440", "P0446"]
-lcd = [0,0,0,0,0,0.11,0,0]
+lcd = [0,0,0,0,0,0.11,0,0,0,222]
 
-### ktb attn to piTFT RESOLUTION
+### ktb2 attn to piTFT RESOLUTION
 ## Screen settings
 RESOLUTION = (480, 320)
 BLACK = (0, 0, 0)
