@@ -29,12 +29,12 @@ disposition = "Feet stuck, can't move"
 
 #### <Debug flag pairs
 ## Normal mode
-#debugFlag = False
-#exitOnDebug = False
+debugFlag = False
+exitOnDebug = False
 
 ## Do debug and persist (i.e., live demo)
-debugFlag = True
-exitOnDebug = False
+#debugFlag = True
+#exitOnDebug = False
 
 ## Do debug & exit
 #debugFlag = True
@@ -55,7 +55,8 @@ piTFT = True
 ##Flag to print via obd call 0100
 printCommands = True
 ##AutoClear if currentdtc matches selectdtc:
-autoclearSDTC = True
+autoclearSDTC = False
+###autoclearSDTC = True
 
 #Strings
 startTime = datetime.datetime.today().strftime('%Y%m%d%H%M%S')

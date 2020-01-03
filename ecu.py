@@ -88,11 +88,12 @@ class ecuThread(Thread):
     connection.watch(obd.commands.ENGINE_LOAD, callback=self.new_engine_load)
     connection.watch(obd.commands.TIMING_ADVANCE, callback=self.new_timing_advance)
 
-    if printCommands:
-      config.disposition = "ATTN: Commands fetched"
-      printCommands = False
-      print "ecu.py printing 0100 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
-      connection.watch(obd.print_commands, callback=self.new_commandsReturn)
+### ktb0 issue here
+###    if printCommands:
+###      config.disposition = "ATTN: Commands fetched"
+###      printCommands = False
+###      print "ecu.py printing 0100 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
+###      connection.watch(obd.print_commands, callback=self.new_commandsReturn)
     ## if deepscan: #... no need to run DTC checks every cycle ... ktb2
     connection.watch(obd.commands.GET_DTC, callback=self.new_dtc)
     connection.watch(obd.commands.GET_CURRENT_DTC, callback=self.new_pending)

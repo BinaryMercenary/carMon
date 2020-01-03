@@ -169,6 +169,7 @@ while True:
       if config.debugFlag:
         #Debug gui display refresh 10 times a second.
         if config.gui_test_time > config.dbg_rate:
+          #attn ktb0 - there is a logLength issue here after click event
           config.lcd = log.getLogValues(list,logLength)
           config.debugFlag = config.lcd[0]
           #log.getLogValues(list,logLength)
