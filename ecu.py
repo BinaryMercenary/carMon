@@ -88,12 +88,6 @@ class ecuThread(Thread):
     connection.watch(obd.commands.ENGINE_LOAD, callback=self.new_engine_load)
     connection.watch(obd.commands.TIMING_ADVANCE, callback=self.new_timing_advance)
 
-### ktb0 issue here
-###    if printCommands:
-###      config.disposition = "ATTN: Commands fetched"
-###      printCommands = False
-###      print "ecu.py printing 0100 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
-###      connection.watch(obd.print_commands, callback=self.new_commandsReturn)
     ## if deepscan: #... no need to run DTC checks every cycle ... ktb2
     connection.watch(obd.commands.GET_DTC, callback=self.new_dtc)
     connection.watch(obd.commands.GET_CURRENT_DTC, callback=self.new_pending)
@@ -113,11 +107,22 @@ class ecuThread(Thread):
       print clearDTC
       print "log these resets, pls - ktb2 - <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"
 
+
     # Start the connection.
     connection.start()
 
+# # ktb0 issue here
+    if config.printCommands == "ktb":
+      config.printCommands = False
+      config.disposition = "ATTN: Commands fetched"
+      print "ecu.py printing 0100 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>ktb>>>"
+      connection.watch(obd.print_commands, callback=self.new_commandsReturn)
+      #ktb# connection.watch(obd.commands.02,0100, callback=self.new_commandsReturn)
+
+
     # Set the ready flag so we can boot the GUI.
-    config.ecuReady = True
+    if config.gogoGadgetGUI:
+      config.ecuReady = True
 
   def new_commandsReturn(self, r):
     global commandsReturn

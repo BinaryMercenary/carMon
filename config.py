@@ -51,6 +51,7 @@ settingsFlag = False
 
 ## Inits to True (when piTFT is used)
 piTFT = True
+gogoGadgetGUI = False
 
 ##Flag to print via obd call 0100
 printCommands = True
