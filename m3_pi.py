@@ -26,8 +26,9 @@ if not config.debugFlag:
 
     # Give time for the ECU to connect before we start the GUI.
     while not config.ecuReady:
-      time.sleep(.01)
-
+      ## a careful if statement with a toggler var could get me flashing gauge at startup qqq ktb6
+      time.sleep(.01) #is 100fps a goal when GW's POC was 55fps? ktb4 slow the roll?
+      ##if you want to watch values write them to the logs and use watch with ls -t and tail #ktbdoc
 # Load all of our tach images into an array so we can easily access them.
 background_dir = 'tach/'
 background_files = ['%i.png' % i for i in range(0, config.rpm_grads + 1)]
@@ -87,7 +88,7 @@ while True:
       if event.type == MOUSEBUTTONDOWN:
         #Toggle the settings flag when the screen is touched.
         config.settingsFlag = not config.settingsFlag
-        # kb events splash mode -- will playback the log file again
+        # kb events splash mode -- playback the dummy/debug file again
         config.debugFlag = True
 
     if not config.debugFlag:
@@ -99,10 +100,6 @@ while True:
 
     # Clear the screen
     windowSurface.fill(config.BLACK)
-
-    ## ktb2 this will be a whole new module, dtc.py with def parseDTCs(list,list)
-    #probably a 3d array paged by gray, yellow, red, or 2d with 0123 values
-    ##all this logic is for test only:
 
     # Load the M3 logo
     windowSurface.blit(img, (windowSurface.get_rect().centerx - 105, windowSurface.get_rect().centery + 60))
@@ -165,6 +162,7 @@ while True:
       drawText(str(ecu.engineLoad) + " %", 0, -145, "readout")
       drawText("Load", 0, -110, "label")
 
+
       # If debug flag is set, feed fake data so we can test the GUI.
       if config.debugFlag:
         #Debug gui display refresh 10 times a second.
@@ -178,12 +176,13 @@ while True:
              log.closeLog()
              pygame.quit()
              sys.exit()
-          # ktb2 set conditions to run ecu connect AFTER debug if so desired
           if not config.exitOnDebug and not config.debugFlag:
-             # T/T plays debug forever # ktb2
-             config.debugFlag = False
+             #Do some work...
+             print "Not exiting debug mode"
+             ## T/T plays debug forever # ktb2
+             # config.debugFlag = True
              # ktb2 ktb2 toggled
-             config.ecuReady = True
+             #config.ecuReady = True
           ##dbg
           ecu.rpm = config.lcd[1]
           ecu.speed = config.lcd[2]
@@ -217,7 +216,8 @@ while True:
 
     # Do logs per the specified asynch interval
     if config.time_elapsed_since_last_action > config.log_rate:
-      #Log all of our data.
+      #Log all of our data. 
+      ##ktb4 I still need to do something with config.disposition for output AND proper population
       config.disposition = config.disposition.replace(',', '')
       data = [datetime.datetime.today().strftime('%Y%m%d%H%M%S'), ecu.rpm, ecu.speed, ecu.coolantTemp, ecu.intakeTemp, ecu.MAF, ecu.throttlePosition, ecu.engineLoad, config.disposition]
       ##this mechanism may be self-defeated above, BUT a good placeholder
@@ -227,7 +227,6 @@ while True:
       config.time_elapsed_since_last_action = 0
     # draw the window onto the screen
     pygame.display.update()
-
 
 
 

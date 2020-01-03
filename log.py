@@ -3,6 +3,8 @@ import csv, os
 from config import *
 ##import config
 
+##ktb5 need to get logging format extended for more fields (tho log.py itself may be 100% there)
+
 #Function to create a csv with the specified header.
 def createLog(header):
   #Write the header of the csv file.

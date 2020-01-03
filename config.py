@@ -16,6 +16,7 @@ logIter = 1
 ## Inits to other
 ## This doesn't have to be 50, as there are only 0-42 graduations,
 ## but higher value will have flash effect, especially with a padded rpm value
+carrier = 21 #ktb test value - cleanup qqq
 rpm_grads = 50
 redline_rpm = 6250
 rpm_weight = redline_rpm // rpm_grads
@@ -51,21 +52,23 @@ settingsFlag = False
 
 ## Inits to True (when piTFT is used)
 piTFT = True
-gogoGadgetGUI = False
+##gogoGadgetGUI = False
+gogoGadgetGUI = True
+#ktb unc# gogoGadgetGUI = True
 
 ##Flag to print via obd call 0100
 printCommands = True
 ##AutoClear if currentdtc matches selectdtc:
-autoclearSDTC = False
+autoclearSDTC = False #uses 04: Clear DTCs and Freeze data
 ###autoclearSDTC = True
 
 #Strings
 startTime = datetime.datetime.today().strftime('%Y%m%d%H%M%S')
 
 #init to int 0, too:
-dtc_error = 0
-dtc_pending = 0
-dtc_inc = 0 
+dtc_error = 0 # 03: Get DTCs
+dtc_pending = 0 # use 07: Get DTCs from the current/last driving cycle
+dtc_inc = 0 #use 0600: Supported MIDs [01-20]
 #dtc_inc = 4 
 
 #lists

@@ -79,19 +79,14 @@ class ecuThread(Thread):
 
     # Watch everything we care about.
     ## what happens of we "Care" too much?  M-VCI even warns 5 param... ktb3 to test reduced list pls
-    connection.watch(obd.commands.RPM, callback=self.new_rpm)
-    connection.watch(obd.commands.SPEED, callback=self.new_speed)
-    connection.watch(obd.commands.COOLANT_TEMP, callback=self.new_coolant_temp)
-    connection.watch(obd.commands.INTAKE_TEMP, callback=self.new_intake_temp)
-    connection.watch(obd.commands.MAF, callback=self.new_MAF)
-    connection.watch(obd.commands.THROTTLE_POS, callback=self.new_throttle_position)
-    connection.watch(obd.commands.ENGINE_LOAD, callback=self.new_engine_load)
-    connection.watch(obd.commands.TIMING_ADVANCE, callback=self.new_timing_advance)
-
-    ## if deepscan: #... no need to run DTC checks every cycle ... ktb2
-    connection.watch(obd.commands.GET_DTC, callback=self.new_dtc)
-    connection.watch(obd.commands.GET_CURRENT_DTC, callback=self.new_pending)
-    #connection.watch(obd.commands. for Incomplete monitors - tbd ktb2
+    ### actually ktb3 I owe back the PIDs, but want to make them layers QOS type metrics, with rpm at 1:1 pull and temp at 1:3 etc
+    connection.watch(obd.commands[0x01][0x05], callback=self.new_coolant_temp)
+    #connection.watch(obd.commands[0x01][0x05], callback=self.new_intake_temp)
+    # comes back with 0-value # connection.watch(obd.commands[0x02][0x05], callback=self.new_intake_temp) #try running coolant alt read???
+    ##ktb these with squares are hacks ^ v
+    ##FAILS/crashes ktb  ## connection.watch(obd.commands[0x02][0xB6], callback=self.new_intake_temp) #try running for atf temp?
+    connection.watch(obd.commands[0x1][0x11], callback=self.new_MAF)
+    connection.watch(obd.commands[0x01][0x11], callback=self.new_throttle_position)
     
     ## ktb2 - would it be safer to clear this at idle/acc mode (only)???
     #config.autoclearSDTC = True
@@ -110,15 +105,6 @@ class ecuThread(Thread):
 
     # Start the connection.
     connection.start()
-
-# # ktb0 issue here
-    if config.printCommands == "ktb":
-      config.printCommands = False
-      config.disposition = "ATTN: Commands fetched"
-      print "ecu.py printing 0100 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>ktb>>>"
-      connection.watch(obd.print_commands, callback=self.new_commandsReturn)
-      #ktb# connection.watch(obd.commands.02,0100, callback=self.new_commandsReturn)
-
 
     # Set the ready flag so we can boot the GUI.
     if config.gogoGadgetGUI:
