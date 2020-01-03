@@ -87,14 +87,14 @@ class ecuThread(Thread):
     ##FAILS/crashes ktb  ## connection.watch(obd.commands[0x02][0xB6], callback=self.new_intake_temp) #try running for atf temp?
 
     connection.watch(obd.commands.RPM, callback=self.new_rpm)
-    connection.watch(obd.commands.SPEED, callback=self.new_speed)
+    #connection.watch(obd.commands.SPEED, callback=self.new_speed)
     #connection.watch(obd.commands.COOLANT_TEMP, callback=self.new_coolant_temp)
-    connection.watch(obd.commands[0x01][0x05], callback=self.new_coolant_temp)
-    connection.watch(obd.commands.INTAKE_TEMP, callback=self.new_intake_temp)
-    connection.watch(obd.commands.MAF, callback=self.new_MAF)
-    connection.watch(obd.commands.THROTTLE_POS, callback=self.new_throttle_position)
-    connection.watch(obd.commands.ENGINE_LOAD, callback=self.new_engine_load)
-    connection.watch(obd.commands.GET_DTC, callback=self.new_dtc)
+    #connection.watch(obd.commands[0x01][0x05], callback=self.new_coolant_temp)
+    #connection.watch(obd.commands.INTAKE_TEMP, callback=self.new_intake_temp)
+    #connection.watch(obd.commands.MAF, callback=self.new_MAF)
+    #connection.watch(obd.commands.THROTTLE_POS, callback=self.new_throttle_position)
+    #connection.watch(obd.commands.ENGINE_LOAD, callback=self.new_engine_load)
+    #connection.watch(obd.commands.GET_DTC, callback=self.new_dtc)
     
     ## ktb2 - would it be safer to clear this at idle/acc mode (only)???
     #config.autoclearSDTC = True
@@ -139,6 +139,16 @@ class ecuThread(Thread):
   def new_rpm(self, r):
     global rpm
     rpm = int(r.value.magnitude)
+    print rpm
+    print rpm
+    print rpm
+    print rpm
+    print rpm
+    print rpm
+    print rpm
+    print rpm
+    print rpm
+    print rpm
 
   def new_speed(self, r):
     global speed
