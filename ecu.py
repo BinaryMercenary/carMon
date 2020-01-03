@@ -77,16 +77,24 @@ class ecuThread(Thread):
     # Connect to the ECU.
     connection = obd.Async("/dev/ttyUSB0", 115200, "3", fast=False)
 
-    # Watch everything we care about.
-    ## what happens of we "Care" too much?  M-VCI even warns 5 param... ktb3 to test reduced list pls
-    ### actually ktb3 I owe back the PIDs, but want to make them layers QOS type metrics, with rpm at 1:1 pull and temp at 1:3 etc
-    connection.watch(obd.commands[0x01][0x05], callback=self.new_coolant_temp)
-    #connection.watch(obd.commands[0x01][0x05], callback=self.new_intake_temp)
-    # comes back with 0-value # connection.watch(obd.commands[0x02][0x05], callback=self.new_intake_temp) #try running coolant alt read???
-    ##ktb these with squares are hacks ^ v
+  # Watch everything we care about.
+   ## what happens of we "Care" too much?  M-VCI even warns 5 param... ktb3 to test reduced list pls
+    ### actually ktb3 I want to make them layers QOS type metrics, with rpm at 1:1 pull and temp at 1:3 runs etc
+    ### to see if we can read a bit faster for certain values??
+
+    ### Gear seletion, ATF Temp etc worked with techstream and M-VCI cable / j2534 i
+    ### Wonder if I'll need to get into this? ****https://github.com/keenanlaws/Python-J2534-Interface/blob/master/J2534.py
     ##FAILS/crashes ktb  ## connection.watch(obd.commands[0x02][0xB6], callback=self.new_intake_temp) #try running for atf temp?
-    connection.watch(obd.commands[0x1][0x11], callback=self.new_MAF)
-    connection.watch(obd.commands[0x01][0x11], callback=self.new_throttle_position)
+
+    connection.watch(obd.commands.RPM, callback=self.new_rpm)
+    connection.watch(obd.commands.SPEED, callback=self.new_speed)
+    #connection.watch(obd.commands.COOLANT_TEMP, callback=self.new_coolant_temp)
+    connection.watch(obd.commands[0x01][0x05], callback=self.new_coolant_temp)
+    connection.watch(obd.commands.INTAKE_TEMP, callback=self.new_intake_temp)
+    connection.watch(obd.commands.MAF, callback=self.new_MAF)
+    connection.watch(obd.commands.THROTTLE_POS, callback=self.new_throttle_position)
+    connection.watch(obd.commands.ENGINE_LOAD, callback=self.new_engine_load)
+    connection.watch(obd.commands.GET_DTC, callback=self.new_dtc)
     
     ## ktb2 - would it be safer to clear this at idle/acc mode (only)???
     #config.autoclearSDTC = True
