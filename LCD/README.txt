@@ -17,6 +17,7 @@ git clone https://github.com/waveshare/LCD-show.git
 cd LCD-show/
 chmod +x LCD35-show
 ./LCD35-show
+#./LCD-hdmi ## to change back
 
 sudo raspi-config #was not needed in my use case
 (the alternate disk image offerred but waveshare may not see use by me)
