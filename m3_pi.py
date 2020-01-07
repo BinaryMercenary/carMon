@@ -27,7 +27,7 @@ if not config.debugFlag:
     # Give time for the ECU to connect before we start the GUI.
     while not config.ecuReady:
       ## a careful if statement with a toggler var could get me flashing gauge at startup qqq ktb6
-      time.sleep(.01) #is 100fps a goal when GW's POC was 55fps? ktb4 slow the roll?
+      time.sleep(.03) #is 100fps a goal when GW's POC was 55fps? ktb4 slow the roll?
       ##if you want to watch values write them to the logs and use watch with ls -t and tail #ktbdoc
 # Load all of our tach images into an array so we can easily access them.
 background_dir = 'tach/'
@@ -51,7 +51,9 @@ if config.piTFT:
     pygame.mouse.set_visible(0)
     windowSurface = pygame.display.set_mode(config.RESOLUTION)
 else :
-    windowSurface = pygame.display.set_mode(config.RESOLUTION, 0, 32)
+    windowSurface = pygame.display.set_mode(config.RESOLUTION, FULLSCREEN)
+    ## Not sure what GW was doing with this original else:
+    # #windowSurface = pygame.display.set_mode(config.RESOLUTION, 0, 32)
 
 # Set up fonts
 readoutFont = pygame.font.Font("/home/pi/carMon/fonts/TitilliumWeb-Light.ttf", 40)
@@ -207,6 +209,7 @@ while True:
             config.dbg_rate = config.log_rate // (logLength + 1)
           print config.dbg_rate
           print config.debugFlag
+
 
     # Update the clock.
     dt = clock.tick()
