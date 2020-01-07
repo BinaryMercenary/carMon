@@ -49,9 +49,12 @@ if config.piTFT:
     os.putenv('SDL_FBDEV', '/dev/fb1')
     pygame.init()
     pygame.mouse.set_visible(0)
-    windowSurface = pygame.display.set_mode(config.RESOLUTION)
-else :
     windowSurface = pygame.display.set_mode(config.RESOLUTION, FULLSCREEN)
+else :
+    os.putenv('SDL_FBDEV', '/dev/fb1')
+    pygame.init()
+    pygame.mouse.set_visible(0)
+    windowSurface = pygame.display.set_mode(config.RESOLUTION)
     ## Not sure what GW was doing with this original else:
     # #windowSurface = pygame.display.set_mode(config.RESOLUTION, 0, 32)
 
