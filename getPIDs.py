@@ -26,3 +26,10 @@ def run(self):
 
 ## a minimally intimidating rendition of ecu.py for showing POC/PIDs and cable to work, etc.
 ## BUT obd v061 needs hacked - ktbdoc (and obd v071 has some breaking changes)
+## the change requires an edit to the obd file in /home/pi/.local/...
+## where the count is returned, add a statement that prints the object, as follows:
+## ktb7 - Document:
+
+## Attention: a message about 7 Modes found means the cable is seen but NOT talking to your ecu
+## your car needs to be at IGN (running, or no.  Granted, the battery drains in less than a few hours...)
+
