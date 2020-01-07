@@ -51,7 +51,8 @@ ecuReady = False
 settingsFlag = False
 
 ## Inits to True (when piTFT is used)
-piTFT = True
+piTFT = False
+#piTFT = True
 ##gogoGadgetGUI = False
 gogoGadgetGUI = True
 #ktb unc# gogoGadgetGUI = True
