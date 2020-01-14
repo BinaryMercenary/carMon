@@ -34,3 +34,5 @@ ISO 14230-4 KWP (5 baud init, 10.4 kbit/s)         <- tbd - contemparary to ISO 
 ISO 14230-4 KWP (fast init, 10.4 kbit/s)           <- tbd - contemparary to ISO 9141-2
 
 See excerpt ./library/tbd_powertrain.api
+
+on other lines -- tbd how to swipe for exit using pygame
