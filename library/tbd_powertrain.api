@@ -1,0 +1,121 @@
+(tbd on how this will work -- excerpt from PassThru_API-1.pdf pages 17-19)
+
+Remarks
+If the PassThru device has a resource or timing issue between transmitting a periodic message and a generic
+UserApplication message then transmitting the periodic message will take precedence.
+In order to add more periodic messages after the ERR_EXCEEDED_LIMIT return code, the User
+Application is expected to delete one or more existing periodic messages. This will free up space in the
+PassThru devices periodic message table and allow the addition of more periodic messages.
+The code sample below demonstrates how to setup the PassThruStartPeriodicMsg function parameters. On
+successful completion the MsgID parameter will contain the message handle that is required for the
+PassThruStopPeriodicMsg function call. Refer to PASSTHRU_MSG structure definition on page 46.
+typedef struct {
+ unsigned long ProtocolID; /* vehicle network protocol */
+ unsigned long RxStatus; /* receive message status */
+ unsigned long TxFlags; /* transmit message flags */
+ unsigned long Timestamp; /* receive message timestamp(in microseconds) */
+ unsigned long DataSize; /* byte size of message payload in the Data array */
+ unsigned long ExtraDataIndex; /* start of extra data(i.e. CRC, checksum, etc) in Data array */
+ unsigned char Data[4128]; /* message payload or data */
+} PASSTHRU_MSG;
+typedef struct {
+ unsigned long NumOfBytes; /* Number of functional addresses in array */
+ unsigned char *BytePtr; /* pointer to functional address array */
+} SBYTE_ARRAY;
+typedef struct {
+ unsigned long Parameter; /* Name of configuration parameter */
+ unsigned long Value; /* Value of configuration parameter */
+} SCONFIG
+typedef struct {
+ unsigned long NumOfParams; /* size of SCONFIG array */
+ SCONFIG *ConfigPtr; /* array containing configuration item(s) */
+} SCONFIG_LIST;
+SCONFIG CfgItem;
+SCONFIG_LIST Input;
+SBYTE_ARRAY InputMsg;
+unsigned char FuncAddr[2]; /* Functional address array – address values defined in J2178-4 */
+unsigned long status;
+unsigned long ChannelID; /* Logical channel identifier returned by PassThruConnect */
+unsigned long MsgID;
+unsigned long TimeInterval;
+PASSTHRU_MSG Msg;
+char errstr[256];
+status = PassThruConnect(1850PWM, 0x00000000, &ChannelID);
+/*
+** Setup the J1850PWM transceiver’s LAN message filtering registers(physical source address register
+** and address look-up table registers). These registers determine which Network messages from the
+
+** vehicle LAN will enter the transceiver’s receive register. Their default powerup values cause all
+** Network messages to be ignored.
+**
+** Set the PassThru device physical source address. This value is written to the J1850PWM transceivers
+** physical address register. Physical address values are defined in J2178-1.
+*/
+CfgItem.Parameter = NODE_ADDRESS;
+CfgItem.Value = 0xF1;
+Input.NumOfParams = 1;
+Input.ConfigPtr = &CfgItem;
+status = PassThruIoctl(ChannelID, SET_CONFIG, (void *)&Input, (void *)NULL);
+/*
+** Set the functional addresses for nodes of interest that are connected to the vehicle LAN.
+** This value is written to the J1850PWM transceiver’s look-up table register block.
+** Functional address values defined in J2178-4.
+*/
+FuncAddr[0] = 0x0A; /* Engine Air Intake functional address. */
+FuncAddr[1] = 0x12; /* Throttle functional address. */
+InputMsg.NumOfBytes = 2; /* Functional address array contains two addresses. */
+InputMsg.BytePtr = &FuncAddr[0]; /* Assign pointer to functional address array. */
+status = PassThruIoctl(ChannelID, ADD_TO_FUNCT_MSG_LOOKUP_TABLE, (void *)&InputMsg,
+ (void *)NULL);
+memset(&Msg, 0, sizeof(Msg));
+
+/*
+** Create a Diagnostic command periodic message to obtain supported PIDs from powertrain ECUs.
+** Program the Priority/Message type byte(first Header byte) for 3-byte form of the consolidated header,
+** functional addressing mode for the target address and a message body that will contain diagnostic
+** command/status messages.
+**
+** Priority/message type options selected(refer to J2178-1 for Detailed Header Formats):
+** Priority: Header Bits (7-5) = 6, (0 = highest, 7 = lowest)
+** Header Type Header Bit (4) = 0, three byte consolidated header
+** In-Frame Response Header Bit (3) = 1, In-Frame response not allowed
+** Addressing Type Header Bit (2) = 0, Functional
+** Type Modifier Header Bits (1-0) = 0, Message Type is function command/status
+*/
+Msg.ProtocolID = 1850PWM;
+Msg.Data[0] = 0x68; /* Priority/Message type, first Header byte */
+/*
+** Program the target address(second Header byte) for the legislated diagnostic command message type.
+** (refer to J2178-4 for Message Definitions)
+*/
+Msg.Data[1] = 0x6A; /* Target functional address, second Header byte */
+/*
+** Program the physical source address(third Header byte) of the PassThru device.
+** (
+Msg.Data[2] = 0xF1; /* PassThru device physical source address, third Header byte */
+/*
+** Program the Diagnostic Test Mode(first Data byte) value for selecting Request Current Powertrain
+** Diagnostic Data. (refer to J1979 for Diagnostic Test Modes)
+*/
+Msg.Data[3] = 0x01; /* Test Mode 1, request current powertrain diagnostic data, first Data byte */
+/*
+** Program the Parameter Identifier(second Data byte) value for selecting the supported PIDs request .
+** It is expected that Powertrain specific ECUs will respond with a status message containing a 4 byte bit
+** encoded data field that indicates support or non-support for PIDs 0x01 through 0x20.
+*/
+Msg.Data[4] = 0x00; /* Request Indication of Supported Parameters(PIDs), second Data byte */
+Msg.DataSize = 5; /* Mode 0x01, PID 0x00 diagnostic command message contains 5 bytes */
+/* The PassThru device will transmit the periodic message every 4.9 seconds. */
+TimeInterval = 4900;
+status = PassThruStartPeriodicMsg(ChannelID, &Msg, &MsgID, TimeInterval);
+if (status != STATUS_NOERROR)
+{
+/*
+** PassThruStartPeriodicMsg failed! Get descriptive error string.
+*/
+PassThruGetLastError(&errstr[0]);
+/*
+** Display Error dialog box and/or write error description to Log file.
+*/
+}
+
