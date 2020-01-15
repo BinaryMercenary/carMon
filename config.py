@@ -9,6 +9,7 @@ logLength = 0
 dtc_iter = 0
 time_elapsed_since_last_action = 0
 gui_test_time = 0
+lastSpeed = 0
 
 ## Inits to 1
 logIter = 1

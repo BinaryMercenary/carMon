@@ -142,36 +142,49 @@ class ecuThread(Thread):
 
   def new_rpm(self, r):
     global rpm
-    rpm = int(r.value.magnitude/config.redline_emu*config.redline_rpm)
+    try:
+      rpm = int(r.value.magnitude/config.redline_emu*config.redline_rpm)
+    except:
+      rpm = -1
 
   def new_speed(self, r):
     global speed
-    speed = r.value.to("mph")
+    try:
+      speed = r.value.to("mph")
+    except:
+      speed = config.lastSpeed
+    config.lastSpeed = speed
     speed = int(round(speed.magnitude))
 
   def new_coolant_temp(self, r):
     global coolantTemp
-    coolantTemp = r.value.magnitude
+    coolantTemp = r.value
 
   def new_intake_temp(self, r):
     global intakeTemp
-    intakeTemp = r.value.magnitude
+    intakeTemp = r.value
 
   def new_MAF(self, r):
     global MAF
-    MAF = r.value.magnitude
+    MAF = r.value
 
   def new_throttle_position(self, r):
     global throttlePosition
-    throttlePosition = int(round(r.value.magnitude))
+    try:
+      throttlePosition = int(round(r.value))
+    except:
+      throttlePosition = 111
 
   def new_timing_advance(self, r):
     global timingAdvance
-    timingAdvance = int(round(r.value.magnitude))
+    timingAdvance = int(round(r.value))
 
   def new_engine_load(self, r):
     global engineLoad
-    engineLoad = int(round(r.value.magnitude))
+    try:
+      engineLoad = int(round(r.value))
+    except:
+      engineLoad = 0
 
   def new_dtc(self, r):
     global dtc

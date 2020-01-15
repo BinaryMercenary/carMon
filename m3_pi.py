@@ -22,7 +22,12 @@ def drawText(string, x, y, font):
 
 # Connect to the ECU.
 if not config.debugFlag:
-    ecu.ecuThread()
+    try:
+      ecu.ecuThread()
+    except:
+      #shoot, this doesn't work -- you need some kind of watchdog or sth tricky ktb5
+      print "It's just too much, I can't handle it anymore -- Wifey"
+      sys.exit()
 
     # Give time for the ECU to connect before we start the GUI.
     while not config.ecuReady:
@@ -130,6 +135,9 @@ while True:
         windowSurface.blit(ground[ecu.tach_iter], coords)
       if ecu.tach_iter < 0:
         print "WARNING - negative RPMs are reserved for dark matter engines"
+        if ecu.rpm == -1:
+          sys.exit()
+          #-1 is a "magice number for exit, other negative are for below "light show"
         #let's do something else fun here some other time
         #windowSurface.blit(splasher, (0,0))
         #time.sleep(2.5)
@@ -138,14 +146,13 @@ while True:
       drawText(str(ecu.rpm), 0, 0, "readout")
       drawText("RPM", 0, 50, "label")
 
-      # Draw the intake temp readout and label.
-      drawText(str(ecu.intakeTemp) + "\xb0C", 190, 105, "readout")
-
-      drawText("Intake", 190, 140, "label")
       # Draw the coolant temp readout and label.
-
-      drawText(str(ecu.coolantTemp) + "\xb0C", -160, 105, "readout")
+      drawText(str(ecu.coolantTemp) + "\xb0", -160, 105, "readout") #"\xb0C" adding work - Need config.ktb C/F
       drawText("Coolant", -170, 140, "label")
+
+      # Draw the intake temp readout and label.i
+      drawText(str(ecu.intakeTemp) + "", 190, 105, "readout") #"\xb0C" not want - Need ecu.ktb3 routine for abs<>magn pass/set "-" or sth
+      drawText("Intake", 190, 140, "label")
 
       # Draw the gear readout and label.
       drawText(str(ecu.gear), -190, 0, "readout")
@@ -160,7 +167,7 @@ while True:
       drawText("Throttle", 190, -110, "label")
 
       # Draw the MAF readout and label.
-      drawText(str(ecu.MAF) + " g/s", -150, -145, "readout")
+      drawText(str(ecu.MAF) + "", -150, -145, "readout") #no g/s label, gps is fine
       drawText("MAF", -190, -110, "label")
 
       # Draw the engine load readout and label.
