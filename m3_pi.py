@@ -60,6 +60,8 @@ else :
     pygame.init()
     pygame.mouse.set_visible(0)
     windowSurface = pygame.display.set_mode(config.RESOLUTION)
+    ##ktb9 it would be pretty dope to drive this LIVE via a gpio pin and a switch
+    #windowSurface = pygame.display.set_mode(config.RESOLUTION, FULLSCREEN)
     ## Not sure what GW was doing with this original else:
     # #windowSurface = pygame.display.set_mode(config.RESOLUTION, 0, 32)
 
