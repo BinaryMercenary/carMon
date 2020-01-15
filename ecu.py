@@ -86,6 +86,10 @@ class ecuThread(Thread):
     ### Wonder if I'll need to get into this? ****https://github.com/keenanlaws/Python-J2534-Interface/blob/master/J2534.py
     ##FAILS/crashes ktb  ## connection.watch(obd.commands[0x02][0xB6], callback=self.new_intake_temp) #try running for atf temp?
 
+    #ktb1 these will need wrapped in try/catch statments
+    ##bluetooth elm327 failure to read comes back "dimensionless"
+    ##Also of intersting note, when the connection dies, last value returns and logs endlessly
+    ##There is also an issue that calling DTCs with a tap event currently crashes the routines ktb3
     connection.watch(obd.commands.RPM, callback=self.new_rpm)
     connection.watch(obd.commands.SPEED, callback=self.new_speed)
     connection.watch(obd.commands.COOLANT_TEMP, callback=self.new_coolant_temp)
