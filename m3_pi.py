@@ -147,7 +147,7 @@ while True:
       drawText("RPM", 0, 50, "label")
 
       # Draw the coolant temp readout and label.
-      drawText(str(ecu.coolantTemp) + "\xb0", -160, 105, "readout") #"\xb0C" adding work - Need config.ktb C/F
+      drawText(str(ecu.coolantTemp) + "\xb0", -160, 105, "readout") #"\xb0C" adding work - Need config.ktb C/F (hack - grab left 3 in to.string qqq??)
       drawText("Coolant", -170, 140, "label")
 
       # Draw the intake temp readout and label.i
