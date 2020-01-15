@@ -2,9 +2,10 @@
 import RPi.GPIO as GPIO
 import os, time
 
-# Set GPIO pin 17 as input for shutdown signal.
+## Moved from pin 17 to pin 13 as the ili9486 screen takes up all pins 1-26
+# Set GPIO pin 13 as input for shutdown signal.
 GPIO.setmode(GPIO.BCM)
-GPIO.setup(17, GPIO.IN)
+GPIO.setup(13, GPIO.IN)
 
 # Print message to console.
 print("Running shutdown script...")

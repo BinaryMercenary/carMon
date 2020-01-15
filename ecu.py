@@ -5,6 +5,9 @@ import obd
 import numpy as np
 
 # Globals
+clearDTC = "DTC not cleared"
+commandsReturn = "Return a list of all commands"
+pending = "P9999"
 rpm = 0
 speed = 0
 coolantTemp = 0
@@ -72,59 +75,120 @@ class ecuThread(Thread):
     obd.logger.setLevel(obd.logging.DEBUG)
 
     # Connect to the ECU.
-    connection = obd.Async("/dev/ttyUSB0", 115200, "3", fast=False)
+    connection = obd.Async(config.elmDev, 115200, "3", fast=False)
 
-    # Watch everything we care about.
+  # Watch everything we care about.
+   ## what happens of we "Care" too much?  M-VCI even warns 5 param... ktb3 to test reduced list pls
+    ### actually ktb3 I want to make them layers QOS type metrics, with rpm at 1:1 pull and temp at 1:3 runs etc
+    ### to see if we can read a bit faster for certain values??
+
+    ### Gear seletion, ATF Temp etc worked with techstream and M-VCI cable / j2534 i
+    ### Wonder if I'll need to get into this? ****https://github.com/keenanlaws/Python-J2534-Interface/blob/master/J2534.py
+    ##FAILS/crashes ktb  ## connection.watch(obd.commands[0x02][0xB6], callback=self.new_intake_temp) #try running for atf temp?
+
+    #ktb1 these will need wrapped in try/catch statments
+    ##bluetooth elm327 failure to read comes back "dimensionless"
+    ##Also of intersting note, when the connection dies, last value returns and logs endlessly
+    ##There is also an issue that calling DTCs with a tap event currently crashes the routines ktb3
     connection.watch(obd.commands.RPM, callback=self.new_rpm)
     connection.watch(obd.commands.SPEED, callback=self.new_speed)
     connection.watch(obd.commands.COOLANT_TEMP, callback=self.new_coolant_temp)
+    connection.watch(obd.commands[0x01][0x05], callback=self.new_coolant_temp)
     connection.watch(obd.commands.INTAKE_TEMP, callback=self.new_intake_temp)
     connection.watch(obd.commands.MAF, callback=self.new_MAF)
     connection.watch(obd.commands.THROTTLE_POS, callback=self.new_throttle_position)
     connection.watch(obd.commands.ENGINE_LOAD, callback=self.new_engine_load)
     connection.watch(obd.commands.GET_DTC, callback=self.new_dtc)
+    
+    ## ktb2 - would it be safer to clear this at idle/acc mode (only)???
+    #config.autoclearSDTC = True
+    #config.currentdtc = [""]
+    #config.selectdtc  = [""]
+    if config.autoclearSDTC and (config.currentdtc  == config.selectdtc):
+      config.disposition = "ATTN: DTC cleared"
+      print "log these resets, pls - ktb2 - >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
+      print clearDTC
+      print " ^^^^ un-init value"
+      connection.watch(obd.commands.CLEAR_DTC, callback=self.new_clearDTC)
+      print " vvvv populated value"
+      print clearDTC
+      print "log these resets, pls - ktb2 - <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"
+
 
     # Start the connection.
     connection.start()
 
     # Set the ready flag so we can boot the GUI.
-    config.ecuReady = True
+    if config.gogoGadgetGUI:
+      config.ecuReady = True
+
+  def new_commandsReturn(self, r):
+    global commandsReturn
+    commandsReturn = r
+    print "ktb2 tbd output type/format FOR GET~ALL - >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
+    print commandsReturn
+
+  def new_pending(self, r):
+    global pending
+    pending = r
+    print "ktb2 tbd output type/format FOR PENDING - >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
+    print pending
+
+  def new_clearDTC(self, r):
+    global clearDTC
+    clearDTC = r
+    print "ktb2 tbd output type/format FOR clearDTC - >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
+    print clearDTC
 
   def new_rpm(self, r):
     global rpm
-    rpm = int(r.value.magnitude)
+    try:
+      rpm = int(r.value.magnitude/config.redline_emu*config.redline_rpm)
+    except:
+      rpm = -1
 
   def new_speed(self, r):
     global speed
-    speed = r.value.to("mph")
-    speed = int(round(speed.magnitude))
+    try:
+      speed = r.value.to("mph")
+    except:
+      speed = 0 #config.lastSpeed
+    else:
+      ##~nvm~ this doesn't quite work still, better to explore the datatype and zero it out
+      #config.lastSpeed = speed
+      speed = int(round(speed.magnitude))
 
   def new_coolant_temp(self, r):
     global coolantTemp
-    coolantTemp = r.value.magnitude
+    coolantTemp = r.value
 
   def new_intake_temp(self, r):
     global intakeTemp
-    intakeTemp = r.value.magnitude
+    intakeTemp = r.value
 
   def new_MAF(self, r):
     global MAF
-    MAF = r.value.magnitude
+    MAF = r.value
 
   def new_throttle_position(self, r):
     global throttlePosition
-    throttlePosition = int(round(r.value.magnitude))
+    try:
+      throttlePosition = int(round(r.value))
+    except:
+      throttlePosition = 111
 
   def new_timing_advance(self, r):
     global timingAdvance
-    timingAdvance = int(round(r.value.magnitude))
+    timingAdvance = int(round(r.value))
 
   def new_engine_load(self, r):
     global engineLoad
-    engineLoad = int(round(r.value.magnitude))
+    try:
+      engineLoad = int(round(r.value))
+    except:
+      engineLoad = 0
 
   def new_dtc(self, r):
     global dtc
     dtc = r.value
-
 

@@ -23,5 +23,16 @@ As small/slow take-side vacuum persists, I'm not keen on replacing the 77740-530
 
   After hacking the web-posted code into a working state (cursed html characters, indentation, missing part of log.py, etc.), I tested with the trusty Mini-Vci/M-vci interface cable (Toyota J2354).   The M-VCI cable is not an ELM327 device, afterall, and will not work as-is (if specs/python class can be made to work at all?).   Pity, as I noticed when using the M-VCI cable with Tis Techstream Diagnostic Cable Toyota Firmware V1.4.1, there are many desirable PIDs not seen on my other scanners.   One important value is the ATF temperature.   I've installed an analogue gauge but want to make a thermostat routine in this carMon code that considers ATF fluid value and runs my fan-tap relay at a LUT'd duty cycle.
 
-  My ScanTool OBDLink SX 425801 cable will arrive just after new year, hoping that at least the ATF temperature can be found from that - my new years wish!
+  My ScanTool OBDLink SX 425801 cable will arrive just after new year, hoping that at least the ATF temperature can be found from that - my new years wish!  The cable arrived... the advanced readings _have not_.
 
+  Update: Getting the automatic transmission's Temperature PID (listed or exposted) for the Is300 from 2001-2005 is proving troublesome from ISO-9141-2 protocols.  After I get the rest of the POC working, I may have to double back (pretty far) to see how any K-line type CAN bus dialogues can take place and what PID's are exposed.  I'll be asking tech savvy gearheads in person and on line for insights, in the meantime.  Especially note that there is NOT an exposed powertrain ECU on this car (no split bus/no second address/likely all-in one given the OEM ECU PN schedules).  M-VCI does indeed see many more values than any other obd approach can (even with elm327) so special guidance is needed - perhaps from the pdf I found recently -- Drew Technologies, Inc. SAE J2534 API REFERENCE http://www.drewtech.com/support/passthru.html (the relead DLL that I have from techscrtream wil not port to python easily, tho).
+
+ISO 9141-2 (5 baud init, 10.4 kbit/s)              <------ POC works
+SAE J-1850-PWM (41.6 kbit/s)                       <--- tbd
+ISO 15765-4 CAN (11||29 bit ID, 250||500 kbit/s)   <-- tbd - unlikely since this was standardized circa 2008
+ISO 14230-4 KWP (5 baud init, 10.4 kbit/s)         <- tbd - contemparary to ISO 9141-2
+ISO 14230-4 KWP (fast init, 10.4 kbit/s)           <- tbd - contemparary to ISO 9141-2
+
+See excerpt ./library/tbd_powertrain.api
+
+on other lines -- tbd how to swipe for exit using pygame

@@ -4,6 +4,9 @@ import config, ecu, log, time, datetime, sys
 import pygame, time, os, csv
 from pygame.locals import *
 
+#this is part of the repo and there for NOT in config
+imgdir = "/home/pi/carMon/images/"
+
 #Helper function to draw the given string at coordinate x, y, relative to center.
 def drawText(string, x, y, font):
   if font == "readout":
@@ -19,37 +22,51 @@ def drawText(string, x, y, font):
 
 # Connect to the ECU.
 if not config.debugFlag:
-    ecu.ecuThread()
+    try:
+      ecu.ecuThread()
+    except:
+      #shoot, this doesn't work -- you need some kind of watchdog or sth tricky ktb5
+      print "It's just too much, I can't handle it anymore -- Wifey"
+      sys.exit()
 
     # Give time for the ECU to connect before we start the GUI.
     while not config.ecuReady:
-      time.sleep(.01)
-
+      ## a careful if statement with a toggler var could get me flashing gauge at startup qqq ktb6
+      time.sleep(.03) #is 100fps a goal when GW's POC was 55fps? ktb4 slow the roll?
+      ##if you want to watch values write them to the logs and use watch with ls -t and tail #ktbdoc
 # Load all of our tach images into an array so we can easily access them.
 background_dir = 'tach/'
 background_files = ['%i.png' % i for i in range(0, config.rpm_grads + 1)]
-ground = [pygame.image.load(os.path.join("/home/pi/tach/", file)) for file in background_files]
+ground = [pygame.image.load(os.path.join("/home/pi/carMon/images/", file)) for file in background_files]
 
 # Load the M3 PI image.
-img = pygame.image.load("/home/pi/images/m3_logo.png")
+try:
+    img = pygame.image.load(imgdir + "logo-"  + str(config.dtc_error)  + str(config.dtc_pending)  + str(config.dtc_inc) + ".png")
+except pygame.error:
+    img = pygame.image.load(imgdir + "logo-330.png")
 img_button = img.get_rect(topleft = (135, 220))
 
 # Load the M3 PI image.
-splasher = pygame.image.load("/home/pi/images/b2f-480x320.png")
+splasher = pygame.image.load("/home/pi/carMon/images/b2f-480x320.png")
 
 # Set up the window.If piTFT flag is set, set up the window for the screen.Else create it normally for use on normal monitor.
 if config.piTFT:
     os.putenv('SDL_FBDEV', '/dev/fb1')
     pygame.init()
     pygame.mouse.set_visible(0)
-    windowSurface = pygame.display.set_mode(config.RESOLUTION)
+    windowSurface = pygame.display.set_mode(config.RESOLUTION, FULLSCREEN)
 else :
-    windowSurface = pygame.display.set_mode(config.RESOLUTION, 0, 32)
+    os.putenv('SDL_FBDEV', '/dev/fb1')
+    pygame.init()
+    pygame.mouse.set_visible(0)
+    windowSurface = pygame.display.set_mode(config.RESOLUTION)
+    ## Not sure what GW was doing with this original else:
+    # #windowSurface = pygame.display.set_mode(config.RESOLUTION, 0, 32)
 
 # Set up fonts
-readoutFont = pygame.font.Font("/home/pi/font/ASL_light.ttf", 40)
-labelFont = pygame.font.Font("/home/pi/font/ASL_light.ttf", 30)
-fpsFont = pygame.font.Font("/home/pi/font/ASL_light.ttf", 20)
+readoutFont = pygame.font.Font("/home/pi/carMon/fonts/TitilliumWeb-Light.ttf", 40)
+labelFont = pygame.font.Font("/home/pi/carMon/fonts/TitilliumWeb-Light.ttf", 30)
+fpsFont = pygame.font.Font("/home/pi/carMon/fonts/TitilliumWeb-Light.ttf", 20)
 
 # Set the caption.
 pygame.display.set_caption('M3 PI')
@@ -61,7 +78,7 @@ clock = pygame.time.Clock()
 log.createLog(["TIME", "RPM", "SPEED", "COOLANT_TEMP", "INTAKE_TEMP", "MAF", "THROTTLE_POS", "ENGINE_LOAD"])
 
 # Debug: Instead of reading from the ECU, read from a log file.
-if config.debugFlag:
+if  config.debugFlag:
     #Read the log file into memory.
     list = log.readLog('/home/pi/carMon/debug/debug_log.csv')
     ##list = log.readLog('/logs/debug_log.csv')
@@ -81,6 +98,10 @@ while True:
       if event.type == MOUSEBUTTONDOWN:
         #Toggle the settings flag when the screen is touched.
         config.settingsFlag = not config.settingsFlag
+        # kb events splash mode -- playback the dummy/debug file again
+        #
+        ## this is horrible ktb broke second tap - needs logic around try: loglength
+        config.debugFlag = True
 
     if not config.debugFlag:
       #Figure out what tach image should be.
@@ -91,22 +112,6 @@ while True:
 
     # Clear the screen
     windowSurface.fill(config.BLACK)
-
-    ## ktb this will be a whole new module, dtc.py with def parseDTCs(list,list)
-    #probably a 3d array paged by gray, yellow, red, or 2d with 0123 values
-    ##all this logic is for test only:
-    #if config.dtc_inc = 4 and (config.gui_test_time > config.dbg_rate):
-    if config.dtc_inc == 4:
-      img = pygame.image.load("/home/pi/images/logo-1111.png")
-      ##logo-1110.png
-      ##logo-1100.png
-      ##logo-1000.png
-      #config.dtc_pending == 0
-      ##images/logo-2100.png
-      #config.dtc_error == 0
-      ##logo-3100.png
-      ##logo-3000.png
-      ###add logic handler here for 3xxx state to check for *ONLY* P0440 in config.dtc or ecu.xxx AND THEN auto clear
 
     # Load the M3 logo
     windowSurface.blit(img, (windowSurface.get_rect().centerx - 105, windowSurface.get_rect().centery + 60))
@@ -132,6 +137,9 @@ while True:
         windowSurface.blit(ground[ecu.tach_iter], coords)
       if ecu.tach_iter < 0:
         print "WARNING - negative RPMs are reserved for dark matter engines"
+        if ecu.rpm == -1:
+          sys.exit()
+          #-1 is a "magice number for exit, other negative are for below "light show"
         #let's do something else fun here some other time
         #windowSurface.blit(splasher, (0,0))
         #time.sleep(2.5)
@@ -140,14 +148,13 @@ while True:
       drawText(str(ecu.rpm), 0, 0, "readout")
       drawText("RPM", 0, 50, "label")
 
-      # Draw the intake temp readout and label.
-      drawText(str(ecu.intakeTemp) + "\xb0C", 190, 105, "readout")
-
-      drawText("Intake", 190, 140, "label")
       # Draw the coolant temp readout and label.
-
-      drawText(str(ecu.coolantTemp) + "\xb0C", -160, 105, "readout")
+      drawText(str(ecu.coolantTemp) + "\xb0", -160, 105, "readout") #"\xb0C" adding work - Need config.ktb C/F (hack - grab left 3 in to.string qqq??)
       drawText("Coolant", -170, 140, "label")
+
+      # Draw the intake temp readout and label.i
+      drawText(str(ecu.intakeTemp) + "", 190, 105, "readout") #"\xb0C" not want - Need ecu.ktb3 routine for abs<>magn pass/set "-" or sth
+      drawText("Intake", 190, 140, "label")
 
       # Draw the gear readout and label.
       drawText(str(ecu.gear), -190, 0, "readout")
@@ -162,18 +169,34 @@ while True:
       drawText("Throttle", 190, -110, "label")
 
       # Draw the MAF readout and label.
-      drawText(str(ecu.MAF) + " g/s", -150, -145, "readout")
+      drawText(str(ecu.MAF) + "", -150, -145, "readout") #no g/s label, gps is fine
       drawText("MAF", -190, -110, "label")
 
       # Draw the engine load readout and label.
       drawText(str(ecu.engineLoad) + " %", 0, -145, "readout")
       drawText("Load", 0, -110, "label")
 
+
       # If debug flag is set, feed fake data so we can test the GUI.
       if config.debugFlag:
+        try:
+          logLength
+        except:
+          # #this is a really edge case
+          print "Mr. Two-Taps, you're a bad liar"
+          list = config.dumbLog
+          logLength = len(list)
         #Debug gui display refresh 10 times a second.
         if config.gui_test_time > config.dbg_rate:
-          config.lcd = log.getLogValues(list,logLength)
+          #attn ktb0 - there is a logLength issue here after click event
+          print config.debugFlag 
+          print logLength
+          try:
+            config.lcd = log.getLogValues(list,logLength)
+          except:
+            config.lcd = config.dumbLog
+            ## ktb7 this is horrible, not the way.  Use neg rpms and some range + timer approach
+            #list = log.readLog('/home/pi/carMon/debug/Demo_log.csv')
           config.debugFlag = config.lcd[0]
           #log.getLogValues(list,logLength)
           # Closes after showing all debug values IF config.exitOnDebug is true
@@ -181,9 +204,13 @@ while True:
              log.closeLog()
              pygame.quit()
              sys.exit()
-          # ktb set conditions to run ecu connect AFTER debug if so desired
           if not config.exitOnDebug and not config.debugFlag:
-             config.ecuReady = False
+             #Do some work...
+             print "Not exiting debug mode"
+             ## T/T plays debug forever # ktb2
+             # config.debugFlag = True
+             # ktb2 ktb2 toggled
+             #config.ecuReady = True
           ##dbg
           ecu.rpm = config.lcd[1]
           ecu.speed = config.lcd[2]
@@ -192,8 +219,9 @@ while True:
           ecu.MAF =  config.lcd[5]
           ecu.throttlePosition =  config.lcd[6]
           ecu.engineLoad =  config.lcd[7]
-          ##ktb I will want to log the timing value for my next engine mods...
-          #ecu.timingAdvance =  config.lcd[8]
+          ecu.timingAdvance = config.lcd[8]
+          ecu.transmissionTemp = config.lcd[9]
+          ##ktb keep an eye on this during testing
           #ecu.dtc = None
           ecu.calcGear(ecu.rpm, ecu.speed)
           ecu.getTach()
@@ -208,6 +236,7 @@ while True:
           print config.dbg_rate
           print config.debugFlag
 
+
     # Update the clock.
     dt = clock.tick()
 
@@ -216,12 +245,18 @@ while True:
 
     # Do logs per the specified asynch interval
     if config.time_elapsed_since_last_action > config.log_rate:
-      #Log all of our data.
-      data = [datetime.datetime.today().strftime('%Y%m%d%H%M%S'), ecu.rpm, ecu.speed, ecu.coolantTemp, ecu.intakeTemp, ecu.MAF, ecu.throttlePosition, ecu.engineLoad]
-      log.updateLog(data)
+      #Log all of our data. 
+      ##ktb4 I still need to do something with config.disposition for output AND proper population
+      config.disposition = config.disposition.replace(',', '')
+      data = [datetime.datetime.today().strftime('%Y%m%d%H%M%S'), ecu.rpm, ecu.speed, ecu.coolantTemp, ecu.intakeTemp, ecu.MAF, ecu.throttlePosition, ecu.engineLoad, config.disposition]
+      ##this mechanism may be self-defeated above, BUT a good placeholder
+      if not config.debugFlag:
+        log.updateLog(data)
       # Reset time.
       config.time_elapsed_since_last_action = 0
     # draw the window onto the screen
     pygame.display.update()
+
+
 
 

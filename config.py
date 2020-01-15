@@ -9,6 +9,7 @@ logLength = 0
 dtc_iter = 0
 time_elapsed_since_last_action = 0
 gui_test_time = 0
+lastSpeed = 0 #I may not need this var anymore
 
 ## Inits to 1
 logIter = 1
@@ -16,8 +17,11 @@ logIter = 1
 ## Inits to other
 ## This doesn't have to be 50, as there are only 0-42 graduations,
 ## but higher value will have flash effect, especially with a padded rpm value
+carrier = 21 #ktb test value - cleanup qqq
 rpm_grads = 50
-redline_rpm = 6250
+redline_rpm = 6450 #proper is300 value
+#for normal mode, be sure these match!
+redline_emu = 16383 #IMSB5010 http://www.imsapp.com/support.html max rpm=16383
 rpm_weight = redline_rpm // rpm_grads
 #splash_img = "b2f-480x320.png"
 splash_rate = 2500
@@ -25,15 +29,16 @@ log_rate = 1000
 dbg_rate = 0
 ## change the above dbg value for faster/slower playback
 ## otherwise, it is log_rate // logLength
+disposition = "Feet stuck, can't move"
 
 #### <Debug flag pairs
 ## Normal mode
-#debugFlag = False
-#exitOnDebug = False
+debugFlag = False
+exitOnDebug = False
 
 ## Do debug and persist (i.e., live demo)
-debugFlag = True
-exitOnDebug = False
+#debugFlag = True
+#exitOnDebug = False
 
 ## Do debug & exit
 #debugFlag = True
@@ -49,23 +54,44 @@ ecuReady = False
 settingsFlag = False
 
 ## Inits to True (when piTFT is used)
-piTFT = True
+piTFT = False
+#piTFT = True
+##gogoGadgetGUI = False
+gogoGadgetGUI = True
+#ktb unc# gogoGadgetGUI = True
+
+##Flag to print via obd call 0100
+printCommands = True
+##AutoClear if currentdtc matches selectdtc:
+autoclearSDTC = False #uses 04: Clear DTCs and Freeze data
+###autoclearSDTC = True
 
 #Strings
 startTime = datetime.datetime.today().strftime('%Y%m%d%H%M%S')
+elmDev = "/dev/ttyUSB0"
+#elmDev = "/dev/rfcomm0"
+####for rfcomm, from the cli:
+##bluetoothctl
+###scan on
+###pair 78:9C:E7:04:9C:90
+###paired-devices
+##quit
+##rfcomm bind 0 78:9C:E7:04:9C:90
 
 #init to int 0, too:
-dtc_inc = 0
-dtc_pending = 0
-dtc_error = 0
+dtc_error = 0 # 03: Get DTCs
+dtc_pending = 0 # use 07: Get DTCs from the current/last driving cycle
+dtc_inc = 0 #use 0600: Supported MIDs [01-20]
+#dtc_inc = 4 
 
 #lists
-dtc = []
-#dtc = ["P0440"]
-#dtc = ["P0440", "P0446"]
-lcd = [0,0,0,0,0,0.11,0,0]
+currentdtc = []
+selectdtc = ["P0440"]
+#selectdtc = ["P0440", "P0446"]
+lcd = [0,0,0,0,0,0.11,0,0,0,222]
+dumbLog = lcd
 
-### ktb attn to piTFT RESOLUTION
+### ktb2 attn to piTFT RESOLUTION
 ## Screen settings
 RESOLUTION = (480, 320)
 BLACK = (0, 0, 0)
@@ -78,4 +104,6 @@ speedArr = np.array([[4, 7, 10, 14, 17], [5, 9, 14, 18, 23], [7, 11, 17, 23, 28]
 
 # List of RPM values for above LUT.
 rpmList = np.array([750, 1000, 1250, 1500, 1750, 2000, 2250, 2500, 2750, 3000, 3250,3500, 3750, 4000, 4250, 4500, 4750, 5000, 5250, 5500, 5750, 6000, 6250, 6500, 6750,7000])
+
+## A Duty cycle LUT will be needed here for an active transcooler
 
