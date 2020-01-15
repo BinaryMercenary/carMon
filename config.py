@@ -18,7 +18,9 @@ logIter = 1
 ## but higher value will have flash effect, especially with a padded rpm value
 carrier = 21 #ktb test value - cleanup qqq
 rpm_grads = 50
-redline_rpm = 6250
+redline_rpm = 6450 #proper is300 value
+#for normal mode, be sure these match!
+redline_emu = 16383 #IMSB5010 http://www.imsapp.com/support.html max rpm=16383
 rpm_weight = redline_rpm // rpm_grads
 #splash_img = "b2f-480x320.png"
 splash_rate = 2500

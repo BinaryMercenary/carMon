@@ -138,17 +138,7 @@ class ecuThread(Thread):
 
   def new_rpm(self, r):
     global rpm
-    rpm = int(r.value.magnitude)
-    print rpm
-    print rpm
-    print rpm
-    print rpm
-    print rpm
-    print rpm
-    print rpm
-    print rpm
-    print rpm
-    print rpm
+    rpm = int(r.value.magnitude/config.redline_emu*config.redline_rpm)
 
   def new_speed(self, r):
     global speed
