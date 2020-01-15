@@ -99,6 +99,8 @@ while True:
         #Toggle the settings flag when the screen is touched.
         config.settingsFlag = not config.settingsFlag
         # kb events splash mode -- playback the dummy/debug file again
+        #
+        ## this is horrible ktb broke second tap - needs logic around try: loglength
         config.debugFlag = True
 
     if not config.debugFlag:
@@ -177,10 +179,24 @@ while True:
 
       # If debug flag is set, feed fake data so we can test the GUI.
       if config.debugFlag:
+        try:
+          logLength
+        except:
+          # #this is a really edge case
+          print "Mr. Two-Taps, you're a bad liar"
+          list = config.dumbLog
+          logLength = len(list)
         #Debug gui display refresh 10 times a second.
         if config.gui_test_time > config.dbg_rate:
           #attn ktb0 - there is a logLength issue here after click event
-          config.lcd = log.getLogValues(list,logLength)
+          print config.debugFlag 
+          print logLength
+          try:
+            config.lcd = log.getLogValues(list,logLength)
+          except:
+            config.lcd = config.dumbLog
+            ## ktb7 this is horrible, not the way.  Use neg rpms and some range + timer approach
+            #list = log.readLog('/home/pi/carMon/debug/Demo_log.csv')
           config.debugFlag = config.lcd[0]
           #log.getLogValues(list,logLength)
           # Closes after showing all debug values IF config.exitOnDebug is true

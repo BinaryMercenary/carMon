@@ -9,7 +9,7 @@ logLength = 0
 dtc_iter = 0
 time_elapsed_since_last_action = 0
 gui_test_time = 0
-lastSpeed = 0
+lastSpeed = 0 #I may not need this var anymore
 
 ## Inits to 1
 logIter = 1
@@ -68,8 +68,8 @@ autoclearSDTC = False #uses 04: Clear DTCs and Freeze data
 
 #Strings
 startTime = datetime.datetime.today().strftime('%Y%m%d%H%M%S')
-#elmDev = "/dev/ttyUSB0"
-elmDev = "/dev/rfcomm0"
+elmDev = "/dev/ttyUSB0"
+#elmDev = "/dev/rfcomm0"
 ####for rfcomm, from the cli:
 ##bluetoothctl
 ###scan on
@@ -89,6 +89,7 @@ currentdtc = []
 selectdtc = ["P0440"]
 #selectdtc = ["P0440", "P0446"]
 lcd = [0,0,0,0,0,0.11,0,0,0,222]
+dumbLog = lcd
 
 ### ktb2 attn to piTFT RESOLUTION
 ## Screen settings

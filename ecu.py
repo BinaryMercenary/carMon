@@ -152,11 +152,11 @@ class ecuThread(Thread):
     try:
       speed = r.value.to("mph")
     except:
-      speed = config.lastSpeed
+      speed = 0 #config.lastSpeed
     else:
-      #~nvm~ this doesn't quite work still, better to explore the datatype and zero it out
-      config.lastSpeed = speed
-    speed = int(round(speed.magnitude))
+      ##~nvm~ this doesn't quite work still, better to explore the datatype and zero it out
+      #config.lastSpeed = speed
+      speed = int(round(speed.magnitude))
 
   def new_coolant_temp(self, r):
     global coolantTemp
