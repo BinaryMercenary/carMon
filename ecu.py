@@ -75,7 +75,7 @@ class ecuThread(Thread):
     obd.logger.setLevel(obd.logging.DEBUG)
 
     # Connect to the ECU.
-    connection = obd.Async("/dev/ttyUSB0", 115200, "3", fast=False)
+    connection = obd.Async(config.elmDev, 115200, "3", fast=False)
 
   # Watch everything we care about.
    ## what happens of we "Care" too much?  M-VCI even warns 5 param... ktb3 to test reduced list pls

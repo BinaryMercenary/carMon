@@ -14,6 +14,10 @@ obd.logger.setLevel(obd.logging.DEBUG)
 
 # Connect to the ECU.
 connection = obd.Async("/dev/ttyUSB0", 115200, "3", fast=False)
+##or
+#connection = obd.Async("/dev/rfcomm0", 115200, "3", fast=False)
+##where you ran a command this boot `sudo rfcomm bind 0 00:1D:A5:02:09:48`
+##(sample mac address of paired bluetootctrl elm327 device)
 
 # Start the connection.
 connection.start()
