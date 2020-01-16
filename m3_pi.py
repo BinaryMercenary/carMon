@@ -140,7 +140,9 @@ while True:
       if ecu.tach_iter < 0:
         print "WARNING - negative RPMs are reserved for dark matter engines"
         if ecu.rpm == -1:
-          sys.exit()
+          ecu.tach = 50
+          #ktb8 def add the light show trigger here, not an exit
+          #sys.exit()
           #-1 is a "magice number for exit, other negative are for below "light show"
         #let's do something else fun here some other time
         #windowSurface.blit(splasher, (0,0))
