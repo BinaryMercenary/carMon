@@ -144,7 +144,7 @@ while True:
           ##not audible## os.system('speaker-test -c2 -twav -l3')
           #sound
           os.system('tput bel')
-          os.system('echo "(BT) RPM -1 `date +%Y-%m-%d-%H%M`" >> ../logs/ERROR.`date +%Y-%m-%d-%H%M`.BT.LOG')
+          os.system('echo "(BT) RPM -1 `date +%Y-%m-%d-%H%M.%S`" >> ../logs/ERROR.`date +%Y-%m-%d-%H%M`.BT.LOG')
           #ktb0.5 there is a gap/bug here still - will get mad print and not back to bt connect (watchdog needed)
           #ktb8 def add the light show trigger here, not an exit
           ##and some https://www.pygame.org/docs/ref/mixer.html
