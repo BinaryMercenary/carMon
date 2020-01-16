@@ -141,7 +141,13 @@ while True:
         print "WARNING - negative RPMs are reserved for dark matter engines"
         if ecu.rpm == -1:
           ecu.tach = 50
+          ##not audible## os.system('speaker-test -c2 -twav -l3')
+          #sound
+          os.system('tput bel')
+          os.system('echo "(BT) RPM -1 `date +%Y-%m-%d-%H%M`" >> ../logs/ERROR.`date +%Y-%m-%d-%H%M`.BT.LOG')
+          #ktb0.5 there is a gap/bug here still - will get mad print and not back to bt connect (watchdog needed)
           #ktb8 def add the light show trigger here, not an exit
+          ##and some https://www.pygame.org/docs/ref/mixer.html
           #sys.exit()
           #-1 is a "magice number for exit, other negative are for below "light show"
         #let's do something else fun here some other time
@@ -180,7 +186,6 @@ while True:
       drawText(str(ecu.engineLoad) + " %", 0, -145, "readout")
       drawText("Load", 0, -110, "label")
 
-
       # If debug flag is set, feed fake data so we can test the GUI.
       if config.debugFlag:
         try:
@@ -193,7 +198,7 @@ while True:
         #Debug gui display refresh 10 times a second.
         if config.gui_test_time > config.dbg_rate:
           #attn ktb0 - there is a logLength issue here after click event
-          print config.debugFlag 
+          print config.debugFlag
           print logLength
           try:
             config.lcd = log.getLogValues(list,logLength)
@@ -249,17 +254,31 @@ while True:
 
     # Do logs per the specified asynch interval
     if config.time_elapsed_since_last_action > config.log_rate:
-      #Log all of our data. 
+      #Log all of our data.
       ##ktb4 I still need to do something with config.disposition for output AND proper population
       config.disposition = config.disposition.replace(',', '')
       data = [datetime.datetime.today().strftime('%Y%m%d%H%M%S'), ecu.rpm, ecu.speed, ecu.coolantTemp, ecu.intakeTemp, ecu.MAF, ecu.throttlePosition, ecu.engineLoad, config.disposition]
       ##this mechanism may be self-defeated above, BUT a good placeholder
       if not config.debugFlag:
         log.updateLog(data)
+        if ecu.speed > 110:
+          os.system('echo "DEADLY SPEEDING `date +%Y-%m-%d-%H%M`" >> ../logs/AUDIT.SPEED.110.LOG')
+        elif ecu.speed > 100:
+          os.system('echo "CRAZY SPEEDING `date +%Y-%m-%d-%H%M`" >> ../logs/AUDIT.SPEED.100.LOG')
+        elif ecu.speed > 90:
+          os.system('echo "STUPID SPEEDING `date +%Y-%m-%d-%H%M`" >> ../logs/AUDIT.SPEED.90.LOG')
+        elif ecu.speed > 85:
+          os.system('echo "MORONIC SPEEDING `date +%Y-%m-%d-%H%M`" >> ../logs/AUDIT.SPEED.85.LOG')
+        elif ecu.speed > 80:
+          os.system('echo "RESTRICTED SPEEDING `date +%Y-%m-%d-%H%M`" >> ../logs/AUDIT.SPEED.80.LOG')
+        elif ecu.speed > 75:
+          os.system('echo "CALI-NORM SPEEDING `date +%Y-%m-%d-%H%M`" >> ../logs/AUDIT.SPEED.75.LOG')
+        #if ecu.temp.... #ktb4 log some AUDIT values for temperature or whatever
       # Reset time.
       config.time_elapsed_since_last_action = 0
     # draw the window onto the screen
     pygame.display.update()
+
 
 
 
