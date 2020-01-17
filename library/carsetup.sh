@@ -4,12 +4,12 @@ echo '#!/bin/bash
 # https://mausberry-circuits.myshopify.com/collections/frontpage/products/4amp-car-supply-switch
 ## follow directions from:
 # https://mausberry-circuits.myshopify.com/pages/car-setup
-## Disclaimer - seeing random yellow underamp even with  my wall wart, this mausberry isn't magic 
+## Disclaimer - seeing random yellow underamp even with  my wall wart, this mausberry is not magic 
 
 #this is the GPIO pin connected to the lead on switch labeled OUT
 GPIOpin1=5 # This is pin 29, I promise.
 ##ALSO NOTE - in the absence of the mausberry signals
-##you can simply ground ping 29 to anything (including it's neighbor pin -- GROUND)
+##you can simply ground ping 29 to anything (including neighbor pin -- GROUND)
 ##That will keep the power on, long enough to disable the script
 
 #this is the GPIO pin connected to the lead on switch labeled IN
@@ -28,6 +28,8 @@ SD=0
 SS=0
 SS2=0
 while [ 1 = 1 ]; do
+chmod 700 /home/pi/carMon/m3_pi.py
+ps -C m3_pi.py >/dev/null || /home/pi/carMon/m3_pi.py
 power=$(cat /sys/class/gpio/gpio$GPIOpin1/value)
 uptime=$(</proc/uptime)
 uptime=${uptime%%.*}

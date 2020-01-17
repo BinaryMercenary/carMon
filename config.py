@@ -54,6 +54,7 @@ ecuReady = False
 settingsFlag = False
 
 ## Inits to True (when piTFT is used)
+## basically means "FULLSCREEN" if true...
 piTFT = False
 #piTFT = True
 ##gogoGadgetGUI = False
@@ -68,6 +69,7 @@ autoclearSDTC = False #uses 04: Clear DTCs and Freeze data
 
 #Strings
 startTime = datetime.datetime.today().strftime('%Y%m%d%H%M%S')
+##elm327 bluetooth reliability is not too hot...
 elmDev = "/dev/rfcomm0"
 elmDev = "/dev/ttyUSB0"
 ####for rfcomm, from the cli:
