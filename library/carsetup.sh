@@ -28,6 +28,7 @@ SD=0
 SS=0
 SS2=0
 while [ 1 = 1 ]; do
+##this janky ktb9
 chmod 700 /home/pi/carMon/m3_pi.py
 ps -C m3_pi.py >/dev/null || /home/pi/carMon/m3_pi.py
 power=$(cat /sys/class/gpio/gpio$GPIOpin1/value)
@@ -59,4 +60,5 @@ fi
 sleep 1
 done' > /etc/switch.sh
 sudo chmod 777 /etc/switch.sh
+sudo sed -i '/etc\/switch.sh &/d' /etc/rc.local
 sudo sed -i '$ i /etc/switch.sh &' /etc/rc.local
