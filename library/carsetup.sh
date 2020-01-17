@@ -28,9 +28,12 @@ SD=0
 SS=0
 SS2=0
 while [ 1 = 1 ]; do
-##this janky ktb9
-chmod 700 /home/pi/carMon/m3_pi.py
-ps -C m3_pi.py >/dev/null || /home/pi/carMon/m3_pi.py
+##this janky - nvm
+#chmod 700 /home/pi/carMon/m3_pi.py
+### does not show in the right screen space/tty
+##ps -C m3_pi.py >/dev/null || /home/pi/carMon/m3_pi.py
+### spawns and dies where the same state works in local term - meh
+##ps -C m3_pi.py >/dev/null || runuser -l pi  -c "/home/pi/carMon/m3_pi.py &"
 power=$(cat /sys/class/gpio/gpio$GPIOpin1/value)
 uptime=$(</proc/uptime)
 uptime=${uptime%%.*}
