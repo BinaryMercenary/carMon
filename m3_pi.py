@@ -50,18 +50,19 @@ img_button = img.get_rect(topleft = (135, 220))
 splasher = pygame.image.load("/home/pi/carMon/images/b2f-480x320.png")
 
 # Set up the window.If piTFT flag is set, set up the window for the screen.Else create it normally for use on normal monitor.
+##ktb9 it would be pretty dope to drive this LIVE via a gpio pin and a switch
+##small screen + fullscreen
 if config.piTFT:
     os.putenv('SDL_FBDEV', '/dev/fb1')
     pygame.init()
     pygame.mouse.set_visible(0)
     windowSurface = pygame.display.set_mode(config.RESOLUTION, FULLSCREEN)
+#assume larger LCD and run windowed
 else :
     os.putenv('SDL_FBDEV', '/dev/fb1')
     pygame.init()
     pygame.mouse.set_visible(0)
     windowSurface = pygame.display.set_mode(config.RESOLUTION)
-    ##ktb9 it would be pretty dope to drive this LIVE via a gpio pin and a switch
-    #windowSurface = pygame.display.set_mode(config.RESOLUTION, FULLSCREEN)
     ## Not sure what GW was doing with this original else:
     # #windowSurface = pygame.display.set_mode(config.RESOLUTION, 0, 32)
 

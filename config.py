@@ -68,8 +68,8 @@ autoclearSDTC = False #uses 04: Clear DTCs and Freeze data
 
 #Strings
 startTime = datetime.datetime.today().strftime('%Y%m%d%H%M%S')
-#elmDev = "/dev/ttyUSB0"
 elmDev = "/dev/rfcomm0"
+elmDev = "/dev/ttyUSB0"
 ####for rfcomm, from the cli:
 ##bluetoothctl
 ###scan on
