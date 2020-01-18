@@ -158,6 +158,7 @@ while True:
       # Draw the RPM readout and label.
       drawText(str(ecu.rpm), 0, 0, "readout")
       drawText("RPM", 0, 50, "label")
+      # ktb1 pls add logic to draw a EMU MODE WARNING label when config.redline_emu !=1
 
       # Draw the coolant temp readout and label.
       drawText(str(ecu.coolantTemp) + "\xb0", -160, 105, "readout") #"\xb0C" adding work - Need config.ktb C/F (hack - grab left 3 in to.string qqq??)
