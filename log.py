@@ -40,7 +40,9 @@ def getLogValues(logFile,logLength):
   global MAF
   global throttlePosition
   global engineLoad
-  rpm = int(logFile[logIter][1])
+  ##For rpm, logs will ALWAYS 1) be biased against redline_emu 2) record in a percentage "RPMP".
+  ##So, emu logs will suck but real driving logs will be accurate if redline_emu = 1 or 16383 etc.  
+  rpm = int(logFile[logIter][1]/config.redline_rpm*100) #log as RPMP
   speed = int(logFile[logIter][2])
   coolantTemp = logFile[logIter][3]
   intakeTemp = logFile[logIter][4]
