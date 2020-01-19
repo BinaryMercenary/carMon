@@ -25,7 +25,7 @@ rpm_gauge = 0
 ## it is a delay meant to reduce over polling of the ecu
 ## since we only see sparse updates every 1.25 seconds (avg 2.125s bulk)
 ## ktb1 testing if this will improve bluetooth stability - tho errors just need more handling
-inECUdelay = 0.200
+inECUdelay = 0.025
 
 # Function to figure out what tach image we should display based on the RPM.
 def getTach():
