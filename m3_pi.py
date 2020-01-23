@@ -4,6 +4,10 @@ import config, ecu, log, time, datetime, sys
 import pygame, time, os, csv
 from pygame.locals import *
 
+##ktb4 if you want to move this to config, maybe add some logic
+#where RPMP 0 means never use RPMP, else do use RPMP
+RPMP = 0;
+
 #this is part of the repo and there for NOT in config
 imgdir = "/home/pi/carMon/images/"
 
@@ -138,6 +142,8 @@ while True:
       # Load the tach image
       if ecu.tach_iter >= 0:
         windowSurface.blit(ground[ecu.tach_iter], coords)
+      ## Attention listeners at home - this device's code is hinged around RPM, so we use it as the "Proof of Life"
+      ## when it is absent, the display will be lifeless and the logs will be full of the below warning/error
       if ecu.tach_iter < 0:
         print "WARNING - negative RPMs are reserved for dark matter engines"
         if ecu.rpm == -1:
@@ -259,7 +265,10 @@ while True:
       #Log all of our data.
       ##ktb4 I still need to do something with config.disposition for output AND proper population
       config.disposition = config.disposition.replace(',', '')
-      data = [datetime.datetime.today().strftime('%Y%m%d%H%M%S'), ecu.rpm, ecu.speed, ecu.coolantTemp, ecu.intakeTemp, ecu.MAF, ecu.throttlePosition, ecu.engineLoad, config.disposition]
+#      data = [datetime.datetime.today().strftime('%Y%m%d%H%M%S'), ecu.rpm, ecu.speed, ecu.coolantTemp, ecu.intakeTemp, ecu.MAF, ecu.throttlePosition, ecu.engineLoad, config.disposition]
+      #RPMP
+      RPMP = int(ecu.rpm*100/config.redline_rpm) #log as RPM Perentage
+      data = [datetime.datetime.today().strftime('%Y%m%d%H%M%S'), RPMP, ecu.speed, ecu.coolantTemp, ecu.intakeTemp, ecu.MAF, ecu.throttlePosition, ecu.engineLoad, config.disposition]
       ##this mechanism may be self-defeated above, BUT a good placeholder
       if not config.debugFlag:
         log.updateLog(data)
