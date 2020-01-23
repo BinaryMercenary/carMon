@@ -1,7 +1,6 @@
 #!/usr/bin/python
 import csv, os
 from config import *
-##import config
 
 ##ktb5 need to get logging format extended for more fields (tho log.py itself may be 100% there)
 
@@ -45,7 +44,7 @@ def getLogValues(logFile,logLength):
   coolantTemp = logFile[logIter][3]
   intakeTemp = logFile[logIter][4]
   MAF = logFile[logIter][5]
-  # Cludgy fix for issue where MAF was logged as really log float, causing clipping when displayed on GUI.
+  # Cludgy fix for issue where MAF was logged as really long float, causing clipping when displayed on GUI.
   MAF = format(float(MAF), '.2f')
   throttlePosition = logFile[logIter][6]
   engineLoad = logFile[logIter][7]

@@ -4,6 +4,10 @@ import config, ecu, log, time, datetime, sys
 import pygame, time, os, csv
 from pygame.locals import *
 
+##ktb4 if you want to move this to config, maybe add some logic
+#where RPMP 0 means never use RPMP, else do use RPMP
+RPMP = 0;
+
 #this is part of the repo and there for NOT in config
 imgdir = "/home/pi/carMon/images/"
 
@@ -50,11 +54,14 @@ img_button = img.get_rect(topleft = (135, 220))
 splasher = pygame.image.load("/home/pi/carMon/images/b2f-480x320.png")
 
 # Set up the window.If piTFT flag is set, set up the window for the screen.Else create it normally for use on normal monitor.
+##ktb9 it would be pretty dope to drive this LIVE via a gpio pin and a switch
+##small screen + fullscreen
 if config.piTFT:
     os.putenv('SDL_FBDEV', '/dev/fb1')
     pygame.init()
     pygame.mouse.set_visible(0)
     windowSurface = pygame.display.set_mode(config.RESOLUTION, FULLSCREEN)
+#assume larger LCD and run windowed
 else :
     os.putenv('SDL_FBDEV', '/dev/fb1')
     pygame.init()
@@ -135,10 +142,20 @@ while True:
       # Load the tach image
       if ecu.tach_iter >= 0:
         windowSurface.blit(ground[ecu.tach_iter], coords)
+      ## Attention listeners at home - this device's code is hinged around RPM, so we use it as the "Proof of Life"
+      ## when it is absent, the display will be lifeless and the logs will be full of the below warning/error
       if ecu.tach_iter < 0:
         print "WARNING - negative RPMs are reserved for dark matter engines"
         if ecu.rpm == -1:
-          sys.exit()
+          ecu.tach = 50
+          ##not audible## os.system('speaker-test -c2 -twav -l3')
+          #sound
+          os.system('tput bel')
+          os.system('echo "(BT) RPM -1 `date +%Y-%m-%d-%H%M.%S`" >> ../logs/ERROR.`date +%Y-%m-%d-%H%M`.BT.LOG')
+          #ktb0.5 there is a gap/bug here still - will get mad print and not back to bt connect (watchdog needed)
+          #ktb8 def add the light show trigger here, not an exit
+          ##and some https://www.pygame.org/docs/ref/mixer.html
+          #sys.exit()
           #-1 is a "magice number for exit, other negative are for below "light show"
         #let's do something else fun here some other time
         #windowSurface.blit(splasher, (0,0))
@@ -147,6 +164,7 @@ while True:
       # Draw the RPM readout and label.
       drawText(str(ecu.rpm), 0, 0, "readout")
       drawText("RPM", 0, 50, "label")
+      # ktb1 pls add logic to draw a EMU MODE WARNING label when config.redline_emu !=1
 
       # Draw the coolant temp readout and label.
       drawText(str(ecu.coolantTemp) + "\xb0", -160, 105, "readout") #"\xb0C" adding work - Need config.ktb C/F (hack - grab left 3 in to.string qqq??)
@@ -176,7 +194,6 @@ while True:
       drawText(str(ecu.engineLoad) + " %", 0, -145, "readout")
       drawText("Load", 0, -110, "label")
 
-
       # If debug flag is set, feed fake data so we can test the GUI.
       if config.debugFlag:
         try:
@@ -189,7 +206,7 @@ while True:
         #Debug gui display refresh 10 times a second.
         if config.gui_test_time > config.dbg_rate:
           #attn ktb0 - there is a logLength issue here after click event
-          print config.debugFlag 
+          print config.debugFlag
           print logLength
           try:
             config.lcd = log.getLogValues(list,logLength)
@@ -245,17 +262,34 @@ while True:
 
     # Do logs per the specified asynch interval
     if config.time_elapsed_since_last_action > config.log_rate:
-      #Log all of our data. 
+      #Log all of our data.
       ##ktb4 I still need to do something with config.disposition for output AND proper population
       config.disposition = config.disposition.replace(',', '')
-      data = [datetime.datetime.today().strftime('%Y%m%d%H%M%S'), ecu.rpm, ecu.speed, ecu.coolantTemp, ecu.intakeTemp, ecu.MAF, ecu.throttlePosition, ecu.engineLoad, config.disposition]
+#      data = [datetime.datetime.today().strftime('%Y%m%d%H%M%S'), ecu.rpm, ecu.speed, ecu.coolantTemp, ecu.intakeTemp, ecu.MAF, ecu.throttlePosition, ecu.engineLoad, config.disposition]
+      #RPMP
+      RPMP = int(ecu.rpm*100/config.redline_rpm) #log as RPM Perentage
+      data = [datetime.datetime.today().strftime('%Y%m%d%H%M%S'), RPMP, ecu.speed, ecu.coolantTemp, ecu.intakeTemp, ecu.MAF, ecu.throttlePosition, ecu.engineLoad, config.disposition]
       ##this mechanism may be self-defeated above, BUT a good placeholder
       if not config.debugFlag:
         log.updateLog(data)
+        if ecu.speed > 110:
+          os.system('echo "DEADLY SPEEDING `date +%Y-%m-%d-%H%M`" >> ../logs/AUDIT.SPEED.110.LOG')
+        elif ecu.speed > 100:
+          os.system('echo "CRAZY SPEEDING `date +%Y-%m-%d-%H%M`" >> ../logs/AUDIT.SPEED.100.LOG')
+        elif ecu.speed > 90:
+          os.system('echo "STUPID SPEEDING `date +%Y-%m-%d-%H%M`" >> ../logs/AUDIT.SPEED.90.LOG')
+        elif ecu.speed > 85:
+          os.system('echo "MORONIC SPEEDING `date +%Y-%m-%d-%H%M`" >> ../logs/AUDIT.SPEED.85.LOG')
+        elif ecu.speed > 80:
+          os.system('echo "RESTRICTED SPEEDING `date +%Y-%m-%d-%H%M`" >> ../logs/AUDIT.SPEED.80.LOG')
+        elif ecu.speed > 75:
+          os.system('echo "CALI-NORM SPEEDING `date +%Y-%m-%d-%H%M`" >> ../logs/AUDIT.SPEED.75.LOG')
+        #if ecu.temp.... #ktb4 log some AUDIT values for temperature or whatever
       # Reset time.
       config.time_elapsed_since_last_action = 0
     # draw the window onto the screen
     pygame.display.update()
+
 
 
 

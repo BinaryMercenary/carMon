@@ -1,5 +1,5 @@
 #!/usr/bin/python
-import config
+import config, time
 from threading import Thread
 import obd
 import numpy as np
@@ -21,6 +21,11 @@ gear = 0
 connection = None
 dtc = None
 rpm_gauge = 0
+## this value may belong in config
+## it is a delay meant to reduce over polling of the ecu
+## since we only see sparse updates every 1.25 seconds (avg 2.125s bulk)
+## ktb1 testing if this will improve bluetooth stability - tho errors just need more handling
+inECUdelay = 0.025
 
 # Function to figure out what tach image we should display based on the RPM.
 def getTach():
@@ -67,6 +72,7 @@ class ecuThread(Thread):
     self.start()
 
   def run(self):
+    #time.sleep(inECUdelay)#
     global connection
     ports = obd.scan_serial()
     print ports
@@ -105,6 +111,7 @@ class ecuThread(Thread):
     #config.currentdtc = [""]
     #config.selectdtc  = [""]
     if config.autoclearSDTC and (config.currentdtc  == config.selectdtc):
+      time.sleep(inECUdelay)
       config.disposition = "ATTN: DTC cleared"
       print "log these resets, pls - ktb2 - >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
       print clearDTC
@@ -123,24 +130,28 @@ class ecuThread(Thread):
       config.ecuReady = True
 
   def new_commandsReturn(self, r):
+    time.sleep(inECUdelay)
     global commandsReturn
     commandsReturn = r
     print "ktb2 tbd output type/format FOR GET~ALL - >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
     print commandsReturn
 
   def new_pending(self, r):
+    time.sleep(inECUdelay)
     global pending
     pending = r
     print "ktb2 tbd output type/format FOR PENDING - >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
     print pending
 
   def new_clearDTC(self, r):
+    time.sleep(inECUdelay)
     global clearDTC
     clearDTC = r
     print "ktb2 tbd output type/format FOR clearDTC - >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
     print clearDTC
 
   def new_rpm(self, r):
+    time.sleep(inECUdelay)
     global rpm
     try:
       rpm = int(r.value.magnitude/config.redline_emu*config.redline_rpm)
@@ -148,6 +159,7 @@ class ecuThread(Thread):
       rpm = -1
 
   def new_speed(self, r):
+    time.sleep(inECUdelay)
     global speed
     try:
       speed = r.value.to("mph")
@@ -159,18 +171,22 @@ class ecuThread(Thread):
       speed = int(round(speed.magnitude))
 
   def new_coolant_temp(self, r):
+    time.sleep(inECUdelay)
     global coolantTemp
     coolantTemp = r.value
 
   def new_intake_temp(self, r):
+    time.sleep(inECUdelay)
     global intakeTemp
     intakeTemp = r.value
 
   def new_MAF(self, r):
+    time.sleep(inECUdelay)
     global MAF
     MAF = r.value
 
   def new_throttle_position(self, r):
+    time.sleep(inECUdelay)
     global throttlePosition
     try:
       throttlePosition = int(round(r.value))
@@ -178,10 +194,12 @@ class ecuThread(Thread):
       throttlePosition = 111
 
   def new_timing_advance(self, r):
+    time.sleep(inECUdelay)
     global timingAdvance
     timingAdvance = int(round(r.value))
 
   def new_engine_load(self, r):
+    time.sleep(inECUdelay)
     global engineLoad
     try:
       engineLoad = int(round(r.value))
