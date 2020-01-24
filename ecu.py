@@ -21,6 +21,19 @@ gear = 0
 connection = None
 dtc = None
 rpm_gauge = 0
+fit = -1
+frpd = -1
+fuelRate = -1
+ltft1 = -1
+ltft2 = -1
+o2bs1s1 = -1
+o2bs1s2 = -1
+o2Ltftb1 = -1
+o2Ltftb2 = -1
+o2Stftb1 = -1
+o2Stftb2 = -1
+stft1 = -1
+stft2 = -1
 ## this value may belong in config
 ## it is a delay meant to reduce over polling of the ecu
 ## since we only see sparse updates every 1.25 seconds (avg 2.125s bulk)
