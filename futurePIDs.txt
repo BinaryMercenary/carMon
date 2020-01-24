@@ -1,0 +1,13 @@
+    ##All above PIDs should be polled 100% DC
+    ##tbd dc for the PIDs below - ktb4
+##    BONUS PIDs, please ktb4:
+##    nest these with a IF flag for DEEPECU (or 100), default to -1 and persist value across 100 reads -- and first read)
+##  33  51      1       Absolute Barometric Pressure kPA
+##  44  68      2       Fuel–Air commanded equivalence ratio
+##
+##    BONUS PIDs, please ktb4:
+##    nest these with a IF flag for CODEFOUND (or 100), default to -1 and persist value across 100 reads --- and first read)
+##  32  50      2       Evap. System Vapor Pressure PA
+##  53  83      2       Absolute Evap system Vapor Pressure kPa
+##  54  84      2       Evap system vapor pressure
+

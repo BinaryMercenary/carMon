@@ -267,7 +267,12 @@ while True:
       config.disposition = config.disposition.replace(',', '')
       #RPMP
       RPMP = int(ecu.rpm*100/config.redline_rpm) #log as RPM Perentage
-      data = [datetime.datetime.today().strftime('%Y%m%d%H%M%S'), RPMP, ecu.speed, ecu.coolantTemp, ecu.intakeTemp, ecu.MAF, ecu.throttlePosition, ecu.engineLoad, config.disposition]
+      ##this is too static, something dynamic at later time ktb8
+      ##ktb1 add if statement here to control
+      ##if fast screen mode then:
+      #data = [datetime.datetime.today().strftime('%Y%m%d%H%M%S'), RPMP, ecu.speed, ecu.coolantTemp, ecu.intakeTemp, ecu.MAF, ecu.throttlePosition, ecu.engineLoad, config.disposition]
+      ##else long log mode -- this is pretty slow in iso-9141-2 (4 variable typical)
+      data = [datetime.datetime.today().strftime('%Y%m%d%H%M%S'), ecu.rpm, ecu.speed, ecu.coolantTemp, ecu.intakeTemp, ecu.MAF, ecu.throttlePosition, ecu.engineLoad, ecu.fit, ecu.frpd, ecu.fuelRate, ecu.ltft1, ecu.ltft2, ecu.o2bs1s1, ecu.o2bs1s2, ecu.o2Ltftb1, ecu.o2Ltftb2, ecu.o2Stftb1, ecu.o2Stftb2, ecu.stft1, ecu.stft2, config.disposition]
       ##this mechanism may be self-defeated above, BUT a good placeholder
       if not config.debugFlag:
         log.updateLog(data)

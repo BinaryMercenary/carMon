@@ -71,7 +71,8 @@ autoclearSDTC = False #uses 04: Clear DTCs and Freeze data
 startTime = datetime.datetime.today().strftime('%Y%m%d%H%M%S')
 ##elm327 bluetooth reliability is not too hot... ktb9 branch this out and or try high version for odb lib
 elmDev = "/dev/rfcomm0"
-#elmDev = "/dev/ttyUSB0"
+#
+elmDev = "/dev/ttyUSB0"
 ####for rfcomm, from the cli:
 ##bluetoothctl
 ###scan on

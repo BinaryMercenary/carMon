@@ -106,27 +106,32 @@ class ecuThread(Thread):
     connection.watch(obd.commands.ENGINE_LOAD, callback=self.new_engine_load)
     connection.watch(obd.commands.GET_DTC, callback=self.new_dtc)
 
-    connection.watch(obd.commands.TIMING_ADVANCE, callback=self.new_coolant_temp)
-    connection.watch(obd.commands.FUEL_INJECT_TIMING, callback=self.new_intake_temp)
 
-    connection.watch(obd.commands.SHORT_FUEL_TRIM_1, callback=self.new_coolant_temp)
-    connection.watch(obd.commands.SHORT_FUEL_TRIM_2, callback=self.new_intake_temp)
+    connection.watch(obd.commands.TIMING_ADVANCE, callback=self.new_timing_advance)
+    connection.watch(obd.commands.FUEL_INJECT_TIMING, callback=self.new_fuel_inject_timing)
+
+    connection.watch(obd.commands.SHORT_FUEL_TRIM_1, callback=self.new_short_fuel_trim_1)
+    connection.watch(obd.commands.SHORT_FUEL_TRIM_2, callback=self.new_short_fuel_trim_2)
 
     ## these crash the ecu sim tool but probably work in the car
-    #connection.watch(obd.commands.LONG_FUEL_TRIM_1, callback=self.new_coolant_temp)
-    #connection.watch(obd.commands.LONG_FUEL_TRIM_2, callback=self.new_intake_temp)
+    ## ATTN ktb0 need to add a logic switch here
+    #IF REALLY_REAL
+    connection.watch(obd.commands.LONG_FUEL_TRIM_1, callback=self.new_long_fuel_trim_1)
+    connection.watch(obd.commands.LONG_FUEL_TRIM_2, callback=self.new_long_fuel_trim_2)
+    #Else return dummy -1 values
+    #...
 
-    connection.watch(obd.commands.O2_B1S1, callback=self.new_coolant_temp)
-    connection.watch(obd.commands.O2_B1S2, callback=self.new_intake_temp)
+    connection.watch(obd.commands.O2_B1S1, callback=self.new_o2_b1s1)
+    connection.watch(obd.commands.O2_B1S2, callback=self.new_o2_b1s2)
 
-    connection.watch(obd.commands.SHORT_O2_TRIM_B1, callback=self.new_coolant_temp)
-    connection.watch(obd.commands.SHORT_O2_TRIM_B2, callback=self.new_intake_temp)
+    connection.watch(obd.commands.SHORT_O2_TRIM_B1, callback=self.new_short_o2_trim_b1)
+    connection.watch(obd.commands.SHORT_O2_TRIM_B2, callback=self.new_short_o2_trim_b2)
 
-    connection.watch(obd.commands.LONG_O2_TRIM_B1, callback=self.new_coolant_temp)
-    connection.watch(obd.commands.LONG_O2_TRIM_B2, callback=self.new_intake_temp)
+    connection.watch(obd.commands.LONG_O2_TRIM_B1, callback=self.new_long_o2_trim_b1)
+    connection.watch(obd.commands.LONG_O2_TRIM_B2, callback=self.new_long_o2_trim_b2)
 
-    connection.watch(obd.commands.FUEL_RAIL_PRESSURE_DIRECT, callback=self.new_coolant_temp)
-    connection.watch(obd.commands.FUEL_RATE, callback=self.new_intake_temp)
+    connection.watch(obd.commands.FUEL_RAIL_PRESSURE_DIRECT, callback=self.new_fuel_rail_pressure_direct)
+    connection.watch(obd.commands.FUEL_RATE, callback=self.new_fuel_rate)
 
 
     ##Thanks again Danny @ Ratchets And Wrenches - u rock https://youtu.be/pIJdCZgEiys
@@ -240,4 +245,69 @@ class ecuThread(Thread):
   def new_dtc(self, r):
     global dtc
     dtc = r.value
+
+  def new_fuel_inject_timing(self, r):
+    time.sleep(inECUdelay)
+    global fit
+    fit = r.value
+
+  def new_short_fuel_trim_1(self, r):
+    time.sleep(inECUdelay)
+    global stft1
+    stft1 = r.value
+
+  def new_short_fuel_trim_2(self, r):
+    time.sleep(inECUdelay)
+    global stft2
+    stft2 = r.value
+
+  def new_long_fuel_trim_1(self, r):
+    time.sleep(inECUdelay)
+    global ltft1
+    ltft1 = r.value
+
+  def new_long_fuel_trim_2(self, r):
+    time.sleep(inECUdelay)
+    global ltft2
+    ltft2 = r.value
+
+  def new_o2_b1s1(self, r):
+    time.sleep(inECUdelay)
+    global o2bs1s1
+    o2bs1s1 = r.value
+
+  def new_o2_b1s2(self, r):
+    time.sleep(inECUdelay)
+    global o2bs1s2
+    o2bs1s2 = r.value
+
+  def new_short_o2_trim_b1(self, r):
+    time.sleep(inECUdelay)
+    global o2Stftb1
+    o2Stftb1 = r.value
+
+  def new_short_o2_trim_b2(self, r):
+    time.sleep(inECUdelay)
+    global o2Stftb2
+    o2Stftb2 = r.value
+
+  def new_long_o2_trim_b1(self, r):
+    time.sleep(inECUdelay)
+    global o2Ltftb1
+    o2Ltftb1 = r.value
+
+  def new_long_o2_trim_b2(self, r):
+    time.sleep(inECUdelay)
+    global o2Ltftb2
+    o2Ltftb2 = r.value
+
+  def new_fuel_rail_pressure_direct(self, r):
+    time.sleep(inECUdelay)
+    global frpd
+    frpd = r.value
+
+  def new_fuel_rate(self, r):
+    time.sleep(inECUdelay)
+    global fuelRate
+    fuelRate = r.value
 
