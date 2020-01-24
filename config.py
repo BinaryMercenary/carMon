@@ -90,8 +90,8 @@ dtc_inc = 0 #use 0600: Supported MIDs [01-20]
 currentdtc = []
 selectdtc = ["P0440"]
 #selectdtc = ["P0440", "P0446"]
-lcd = [0,0,0,0,0,0.11,0,0,0,222]
-dumbLog = lcd
+metrics = [0,0,0,0,0,0.11,0,0,0,222]
+dumbLog = metrics
 
 ### ktb2 attn to piTFT RESOLUTION
 ## Screen settings

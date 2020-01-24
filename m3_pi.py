@@ -209,12 +209,12 @@ while True:
           print config.debugFlag
           print logLength
           try:
-            config.lcd = log.getLogValues(list,logLength)
+            config.metrics = log.getLogValues(list,logLength)
           except:
-            config.lcd = config.dumbLog
+            config.metrics = config.dumbLog
             ## ktb7 this is horrible, not the way.  Use neg rpms and some range + timer approach
             #list = log.readLog('/home/pi/carMon/debug/Demo_log.csv')
-          config.debugFlag = config.lcd[0]
+          config.debugFlag = config.metrics[0]
           #log.getLogValues(list,logLength)
           # Closes after showing all debug values IF config.exitOnDebug is true
           if config.exitOnDebug and not config.debugFlag:
@@ -229,15 +229,15 @@ while True:
              # ktb2 ktb2 toggled
              #config.ecuReady = True
           ##dbg
-          ecu.rpm = config.lcd[1]
-          ecu.speed = config.lcd[2]
-          ecu.coolantTemp =  config.lcd[3]
-          ecu.intakeTemp =  config.lcd[4]
-          ecu.MAF =  config.lcd[5]
-          ecu.throttlePosition =  config.lcd[6]
-          ecu.engineLoad =  config.lcd[7]
-          ecu.timingAdvance = config.lcd[8]
-          ecu.transmissionTemp = config.lcd[9]
+          ecu.rpm = config.metrics[1]
+          ecu.speed = config.metrics[2]
+          ecu.coolantTemp =  config.metrics[3]
+          ecu.intakeTemp =  config.metrics[4]
+          ecu.MAF =  config.metrics[5]
+          ecu.throttlePosition =  config.metrics[6]
+          ecu.engineLoad =  config.metrics[7]
+          ecu.timingAdvance = config.metrics[8]
+          ecu.transmissionTemp = config.metrics[9]
           ##ktb keep an eye on this during testing
           #ecu.dtc = None
           ecu.calcGear(ecu.rpm, ecu.speed)

@@ -61,16 +61,16 @@ def getLogValues(logFile,logLength):
   print throttlePosition
   print engineLoad
   ### ] debug
-  lcd[0] = logLength - logIter - 1
-  lcd[1] = rpm
-  lcd[2] = speed
-  lcd[3] = coolantTemp
-  lcd[4] = intakeTemp
-  lcd[5] = MAF
-  lcd[6] = throttlePosition
-  lcd[7] = engineLoad
+  metrics[0] = logLength - logIter - 1
+  metrics[1] = rpm
+  metrics[2] = speed
+  metrics[3] = coolantTemp
+  metrics[4] = intakeTemp
+  metrics[5] = MAF
+  metrics[6] = throttlePosition
+  metrics[7] = engineLoad
   logIter += 1
   # Reset iterator.
   if logIter == logLength:
     logIter = 1
-  return lcd
+  return metrics
