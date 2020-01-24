@@ -38,7 +38,7 @@ stft2 = -1
 ## it is a delay meant to reduce over polling of the ecu
 ## since we only see sparse updates every 1.25 seconds (avg 2.125s bulk)
 ## ktb1 testing if this will improve bluetooth stability - tho errors just need more handling
-inECUdelay = 0.025
+inECUdelay = 0.001
 
 # Function to figure out what tach image we should display based on the RPM.
 def getTach():
@@ -121,30 +121,33 @@ class ecuThread(Thread):
 
 
     connection.watch(obd.commands.TIMING_ADVANCE, callback=self.new_timing_advance)
-    connection.watch(obd.commands.FUEL_INJECT_TIMING, callback=self.new_fuel_inject_timing)
+    ##no support on 2001 is300## connection.watch(obd.commands.FUEL_INJECT_TIMING, callback=self.new_fuel_inject_timing)
 
     connection.watch(obd.commands.SHORT_FUEL_TRIM_1, callback=self.new_short_fuel_trim_1)
     connection.watch(obd.commands.SHORT_FUEL_TRIM_2, callback=self.new_short_fuel_trim_2)
 
-    ## these crash the ecu sim tool but probably work in the car
-    ## ATTN ktb0 need to add a logic switch here
-    #IF REALLY_REAL
-    connection.watch(obd.commands.LONG_FUEL_TRIM_1, callback=self.new_long_fuel_trim_1)
-    connection.watch(obd.commands.LONG_FUEL_TRIM_2, callback=self.new_long_fuel_trim_2)
+    #IF ecu puts out high rpms, assume its an emulator, and assume that emu should not call ltft 
+    if rpm > -1 and rpm < 9999:
+      connection.watch(obd.commands.LONG_FUEL_TRIM_1, callback=self.new_long_fuel_trim_1)
+      connection.watch(obd.commands.LONG_FUEL_TRIM_2, callback=self.new_long_fuel_trim_2)
+    else:
+      ltft1 = -2
+      ltft2 = -2
+ 
     #Else return dummy -1 values
     #...
 
     connection.watch(obd.commands.O2_B1S1, callback=self.new_o2_b1s1)
     connection.watch(obd.commands.O2_B1S2, callback=self.new_o2_b1s2)
 
-    connection.watch(obd.commands.SHORT_O2_TRIM_B1, callback=self.new_short_o2_trim_b1)
-    connection.watch(obd.commands.SHORT_O2_TRIM_B2, callback=self.new_short_o2_trim_b2)
+    ##no support on 2001 is300## connection.watch(obd.commands.SHORT_O2_TRIM_B1, callback=self.new_short_o2_trim_b1)
+    ##no support on 2001 is300## connection.watch(obd.commands.SHORT_O2_TRIM_B2, callback=self.new_short_o2_trim_b2)
 
-    connection.watch(obd.commands.LONG_O2_TRIM_B1, callback=self.new_long_o2_trim_b1)
-    connection.watch(obd.commands.LONG_O2_TRIM_B2, callback=self.new_long_o2_trim_b2)
+    ##no support on 2001 is300## connection.watch(obd.commands.LONG_O2_TRIM_B1, callback=self.new_long_o2_trim_b1)
+    ##no support on 2001 is300## connection.watch(obd.commands.LONG_O2_TRIM_B2, callback=self.new_long_o2_trim_b2)
 
-    connection.watch(obd.commands.FUEL_RAIL_PRESSURE_DIRECT, callback=self.new_fuel_rail_pressure_direct)
-    connection.watch(obd.commands.FUEL_RATE, callback=self.new_fuel_rate)
+    ##no support on 2001 is300## connection.watch(obd.commands.FUEL_RAIL_PRESSURE_DIRECT, callback=self.new_fuel_rail_pressure_direct)
+    ##no support on 2001 is300## connection.watch(obd.commands.FUEL_RATE, callback=self.new_fuel_rate)
 
 
     ##Thanks again Danny @ Ratchets And Wrenches - u rock https://youtu.be/pIJdCZgEiys

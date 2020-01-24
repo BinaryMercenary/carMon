@@ -19,10 +19,14 @@ logIter = 1
 ## but higher value will have flash effect, especially with a padded rpm value
 carrier = 21 #ktb test value - cleanup qqq
 rpm_grads = 50
+
 redline_rpm = 6450 #proper is300 value
 #for normal mode, be sure these match!
-redline_emu = 16383 #IMSB5010 http://www.imsapp.com/support.html max rpm=16383
+redline_emu = 6450
+#redline_emu = 16383 #IMSB5010 http://www.imsapp.com/support.html max rpm=16383
+
 rpm_weight = redline_rpm // rpm_grads
+i_have_an_emu_and_might_use_it = True
 #splash_img = "b2f-480x320.png"
 splash_rate = 2500
 log_rate = 1000
@@ -53,10 +57,9 @@ exitOnDebug = False
 ecuReady = False
 settingsFlag = False
 
-## Inits to True (when piTFT is used)
-## basically means "FULLSCREEN" if true...
-piTFT = False
-#piTFT = True
+## Inits to True (when fullscreen is used)
+fullscreen = False
+#fullscreen = True
 ##gogoGadgetGUI = False
 gogoGadgetGUI = True
 #ktb unc# gogoGadgetGUI = True
@@ -71,8 +74,7 @@ autoclearSDTC = False #uses 04: Clear DTCs and Freeze data
 startTime = datetime.datetime.today().strftime('%Y%m%d%H%M%S')
 ##elm327 bluetooth reliability is not too hot... ktb9 branch this out and or try high version for odb lib
 elmDev = "/dev/rfcomm0"
-#
-elmDev = "/dev/ttyUSB0"
+#elmDev = "/dev/ttyUSB0"
 ####for rfcomm, from the cli:
 ##bluetoothctl
 ###scan on
@@ -94,7 +96,7 @@ selectdtc = ["P0440"]
 metrics = [0,0,0,0,0,0.11,0,0,0,222]
 dumbLog = metrics
 
-### ktb2 attn to piTFT RESOLUTION
+### ktb2 attn to fullscreen RESOLUTION
 ## Screen settings
 RESOLUTION = (480, 320)
 BLACK = (0, 0, 0)

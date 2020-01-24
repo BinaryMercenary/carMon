@@ -53,10 +53,10 @@ img_button = img.get_rect(topleft = (135, 220))
 # Load the M3 PI image.
 splasher = pygame.image.load("/home/pi/carMon/images/b2f-480x320.png")
 
-# Set up the window.If piTFT flag is set, set up the window for the screen.Else create it normally for use on normal monitor.
+# Set up the window.If fullscreen flag is set, set up the window for the screen.Else create it normally for use on normal monitor.
 ##ktb9 it would be pretty dope to drive this LIVE via a gpio pin and a switch
 ##small screen + fullscreen
-if config.piTFT:
+if config.fullscreen:
     os.putenv('SDL_FBDEV', '/dev/fb1')
     pygame.init()
     pygame.mouse.set_visible(0)
@@ -269,10 +269,15 @@ while True:
       RPMP = int(ecu.rpm*100/config.redline_rpm) #log as RPM Perentage
       ##this is too static, something dynamic at later time ktb8
       ##ktb1 add if statement here to control
+
       ##if fast screen mode then:
+      ##LCD minimum
       #data = [datetime.datetime.today().strftime('%Y%m%d%H%M%S'), RPMP, ecu.speed, ecu.coolantTemp, ecu.intakeTemp, ecu.MAF, ecu.throttlePosition, ecu.engineLoad, config.disposition]
+      ##Good metrics for an  2001 is300#
+      data = [datetime.datetime.today().strftime('%Y%m%d%H%M%S'), RPMP, ecu.speed, ecu.coolantTemp, ecu.intakeTemp, ecu.MAF, ecu.throttlePosition, ecu.engineLoad, ecu.fit, ecu.frpd, ecu.fuelRate, ecu.ltft1, ecu.ltft2, ecu.o2bs1s1, ecu.o2bs1s2, ecu.o2Ltftb1, ecu.o2Ltftb2, ecu.o2Stftb1, ecu.o2Stftb2, ecu.stft1, ecu.stft2, config.disposition]
       ##else long log mode -- this is pretty slow in iso-9141-2 (4 variable typical)
-      data = [datetime.datetime.today().strftime('%Y%m%d%H%M%S'), ecu.rpm, ecu.speed, ecu.coolantTemp, ecu.intakeTemp, ecu.MAF, ecu.throttlePosition, ecu.engineLoad, ecu.fit, ecu.frpd, ecu.fuelRate, ecu.ltft1, ecu.ltft2, ecu.o2bs1s1, ecu.o2bs1s2, ecu.o2Ltftb1, ecu.o2Ltftb2, ecu.o2Stftb1, ecu.o2Stftb2, ecu.stft1, ecu.stft2, config.disposition]
+      data = [datetime.datetime.today().strftime('%Y%m%d%H%M%S'), RPMP, ecu.speed, ecu.coolantTemp, ecu.intakeTemp, ecu.MAF, ecu.throttlePosition, ecu.engineLoad, ecu.ltft1, ecu.ltft2, ecu.o2bs1s1, ecu.o2bs1s2, ecu.stft1, ecu.stft2, config.disposition]
+      ##else long log mode -- this is pretty slow in iso-9141-2 (4 variable typical)
       ##this mechanism may be self-defeated above, BUT a good placeholder
       if not config.debugFlag:
         log.updateLog(data)
