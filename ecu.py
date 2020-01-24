@@ -121,7 +121,7 @@ class ecuThread(Thread):
 
 
     connection.watch(obd.commands.TIMING_ADVANCE, callback=self.new_timing_advance)
-    ##no support on 2001 is300## connection.watch(obd.commands.FUEL_INJECT_TIMING, callback=self.new_fuel_inject_timing)
+    ##no support on 2001 is300+elm327## connection.watch(obd.commands.FUEL_INJECT_TIMING, callback=self.new_fuel_inject_timing)
 
     connection.watch(obd.commands.SHORT_FUEL_TRIM_1, callback=self.new_short_fuel_trim_1)
     connection.watch(obd.commands.SHORT_FUEL_TRIM_2, callback=self.new_short_fuel_trim_2)
@@ -140,14 +140,14 @@ class ecuThread(Thread):
     connection.watch(obd.commands.O2_B1S1, callback=self.new_o2_b1s1)
     connection.watch(obd.commands.O2_B1S2, callback=self.new_o2_b1s2)
 
-    ##no support on 2001 is300## connection.watch(obd.commands.SHORT_O2_TRIM_B1, callback=self.new_short_o2_trim_b1)
-    ##no support on 2001 is300## connection.watch(obd.commands.SHORT_O2_TRIM_B2, callback=self.new_short_o2_trim_b2)
+    ##no support on 2001 is300+elm327## connection.watch(obd.commands.SHORT_O2_TRIM_B1, callback=self.new_short_o2_trim_b1)
+    ##no support on 2001 is300+elm327## connection.watch(obd.commands.SHORT_O2_TRIM_B2, callback=self.new_short_o2_trim_b2)
 
-    ##no support on 2001 is300## connection.watch(obd.commands.LONG_O2_TRIM_B1, callback=self.new_long_o2_trim_b1)
-    ##no support on 2001 is300## connection.watch(obd.commands.LONG_O2_TRIM_B2, callback=self.new_long_o2_trim_b2)
+    ##no support on 2001 is300+elm327## connection.watch(obd.commands.LONG_O2_TRIM_B1, callback=self.new_long_o2_trim_b1)
+    ##no support on 2001 is300+elm327## connection.watch(obd.commands.LONG_O2_TRIM_B2, callback=self.new_long_o2_trim_b2)
 
-    ##no support on 2001 is300## connection.watch(obd.commands.FUEL_RAIL_PRESSURE_DIRECT, callback=self.new_fuel_rail_pressure_direct)
-    ##no support on 2001 is300## connection.watch(obd.commands.FUEL_RATE, callback=self.new_fuel_rate)
+    ##no support on 2001 is300+elm327## connection.watch(obd.commands.FUEL_RAIL_PRESSURE_DIRECT, callback=self.new_fuel_rail_pressure_direct)
+    ##no support on 2001 is300+elm327## connection.watch(obd.commands.FUEL_RATE, callback=self.new_fuel_rate)
 
 
     ##Thanks again Danny @ Ratchets And Wrenches - u rock https://youtu.be/pIJdCZgEiys
