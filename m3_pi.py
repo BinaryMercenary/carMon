@@ -194,7 +194,7 @@ while True:
       drawText(str(ecu.engineLoad) + " %", 0, -145, "readout")
       drawText("Load", 0, -110, "label")
 
-      # If debug flag is set, feed fake data so we can test the GUI.
+      # If debug flag is set, feed fake Data so we can test the GUI.
       if config.debugFlag:
         try:
           logLength
@@ -262,10 +262,9 @@ while True:
 
     # Do logs per the specified asynch interval
     if config.time_elapsed_since_last_action > config.log_rate:
-      #Log all of our data.
+      #Log all of our Data.
       ##ktb4 I still need to do something with config.disposition for output AND proper population
       config.disposition = config.disposition.replace(',', '')
-#      data = [datetime.datetime.today().strftime('%Y%m%d%H%M%S'), ecu.rpm, ecu.speed, ecu.coolantTemp, ecu.intakeTemp, ecu.MAF, ecu.throttlePosition, ecu.engineLoad, config.disposition]
       #RPMP
       RPMP = int(ecu.rpm*100/config.redline_rpm) #log as RPM Perentage
       data = [datetime.datetime.today().strftime('%Y%m%d%H%M%S'), RPMP, ecu.speed, ecu.coolantTemp, ecu.intakeTemp, ecu.MAF, ecu.throttlePosition, ecu.engineLoad, config.disposition]

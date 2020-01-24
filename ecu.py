@@ -98,13 +98,44 @@ class ecuThread(Thread):
     ##There is also an issue that calling DTCs with a tap event currently crashes the routines ktb3
     connection.watch(obd.commands.RPM, callback=self.new_rpm)
     connection.watch(obd.commands.SPEED, callback=self.new_speed)
-    connection.watch(obd.commands.COOLANT_TEMP, callback=self.new_coolant_temp)
+    #connection.watch(obd.commands.COOLANT_TEMP, callback=self.new_coolant_temp)
     connection.watch(obd.commands[0x01][0x05], callback=self.new_coolant_temp)
     connection.watch(obd.commands.INTAKE_TEMP, callback=self.new_intake_temp)
     connection.watch(obd.commands.MAF, callback=self.new_MAF)
     connection.watch(obd.commands.THROTTLE_POS, callback=self.new_throttle_position)
     connection.watch(obd.commands.ENGINE_LOAD, callback=self.new_engine_load)
     connection.watch(obd.commands.GET_DTC, callback=self.new_dtc)
+
+    connection.watch(obd.commands.TIMING_ADVANCE, callback=self.new_coolant_temp)
+    connection.watch(obd.commands.FUEL_INJECT_TIMING, callback=self.new_intake_temp)
+
+    connection.watch(obd.commands.SHORT_FUEL_TRIM_1, callback=self.new_coolant_temp)
+    connection.watch(obd.commands.SHORT_FUEL_TRIM_2, callback=self.new_intake_temp)
+
+    ## these crash the ecu sim tool but probably work in the car
+    #connection.watch(obd.commands.LONG_FUEL_TRIM_1, callback=self.new_coolant_temp)
+    #connection.watch(obd.commands.LONG_FUEL_TRIM_2, callback=self.new_intake_temp)
+
+    connection.watch(obd.commands.O2_B1S1, callback=self.new_coolant_temp)
+    connection.watch(obd.commands.O2_B1S2, callback=self.new_intake_temp)
+
+    connection.watch(obd.commands.SHORT_O2_TRIM_B1, callback=self.new_coolant_temp)
+    connection.watch(obd.commands.SHORT_O2_TRIM_B2, callback=self.new_intake_temp)
+
+    connection.watch(obd.commands.LONG_O2_TRIM_B1, callback=self.new_coolant_temp)
+    connection.watch(obd.commands.LONG_O2_TRIM_B2, callback=self.new_intake_temp)
+
+    connection.watch(obd.commands.FUEL_RAIL_PRESSURE_DIRECT, callback=self.new_coolant_temp)
+    connection.watch(obd.commands.FUEL_RATE, callback=self.new_intake_temp)
+
+
+    ##Thanks again Danny @ Ratchets And Wrenches - u rock https://youtu.be/pIJdCZgEiys
+    #short term fuel trim percent will increase of your o2 sensor goes low (lean)
+    #long term fuel trim percent will increase gradually as short term fuel trim percent trends
+    #stft s/b ~+/-3%, 
+    #ltft s/b ~+/-3%, 
+    #sum of ltft + stft sb under ~+/-10%
+
     
     ## ktb2 - would it be safer to clear this at idle/acc mode (only)???
     #config.autoclearSDTC = True

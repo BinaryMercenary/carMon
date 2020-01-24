@@ -29,7 +29,7 @@ log_rate = 1000
 dbg_rate = 0
 ## change the above dbg value for faster/slower playback
 ## otherwise, it is log_rate // logLength
-disposition = "Feet stuck, can't move"
+disposition = "No P0440. 1 Inc. Stock AF. Warren Axle Back."
 
 #### <Debug flag pairs
 ## Normal mode
