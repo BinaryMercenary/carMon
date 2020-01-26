@@ -64,6 +64,10 @@ fullscreen = False
 gogoGadgetGUI = True
 #ktb unc# gogoGadgetGUI = True
 
+logMetrics = True
+deepMetrics = True
+deepMetrics = False
+
 ##Flag to print via obd call 0100
 printCommands = True
 ##AutoClear if currentdtc matches selectdtc:
@@ -94,7 +98,7 @@ currentdtc = []
 selectdtc = ["P0440"]
 #selectdtc = ["P0440", "P0446"]
 metrics = [0,0,0,0,0,0.11,0,0,0,222]
-dumbLog = metrics
+dummyMetrics = metrics
 
 ### ktb2 attn to fullscreen RESOLUTION
 ## Screen settings

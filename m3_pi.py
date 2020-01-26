@@ -201,7 +201,7 @@ while True:
         except:
           # #this is a really edge case
           print "Mr. Two-Taps, you're a bad liar"
-          list = config.dumbLog
+          list = config.dummyMetrics
           logLength = len(list)
         #Debug gui display refresh 10 times a second.
         if config.gui_test_time > config.dbg_rate:
@@ -211,7 +211,7 @@ while True:
           try:
             config.metrics = log.getLogValues(list,logLength)
           except:
-            config.metrics = config.dumbLog
+            config.metrics = config.dummyMetrics
             ## ktb7 this is horrible, not the way.  Use neg rpms and some range + timer approach
             #list = log.readLog('/home/pi/carMon/debug/Demo_log.csv')
           config.debugFlag = config.metrics[0]
@@ -261,7 +261,7 @@ while True:
     config.gui_test_time += dt
 
     # Do logs per the specified asynch interval
-    if config.time_elapsed_since_last_action > config.log_rate:
+    if config.time_elapsed_since_last_action > config.log_rate and config.logMetrics:
       #Log all of our Data.
       ##ktb4 I still need to do something with config.disposition for output AND proper population
       config.disposition = config.disposition.replace(',', '')
@@ -272,13 +272,13 @@ while True:
 
       ##if fast screen mode then:
       ##LCD minimum
-      #data = [datetime.datetime.today().strftime('%Y%m%d%H%M%S'), RPMP, ecu.speed, ecu.coolantTemp, ecu.intakeTemp, ecu.MAF, ecu.throttlePosition, ecu.engineLoad, config.disposition]
+      data = [datetime.datetime.today().strftime('%Y%m%d%H%M%S'), RPMP, ecu.speed, ecu.coolantTemp, ecu.intakeTemp, ecu.MAF, ecu.throttlePosition, ecu.engineLoad, config.disposition]
       ##Good metrics for an  2001 is300#
-      data = [datetime.datetime.today().strftime('%Y%m%d%H%M%S'), RPMP, ecu.speed, ecu.coolantTemp, ecu.intakeTemp, ecu.MAF, ecu.throttlePosition, ecu.engineLoad, ecu.fit, ecu.frpd, ecu.fuelRate, ecu.ltft1, ecu.ltft2, ecu.o2bs1s1, ecu.o2bs1s2, ecu.o2Ltftb1, ecu.o2Ltftb2, ecu.o2Stftb1, ecu.o2Stftb2, ecu.stft1, ecu.stft2, config.disposition]
+      #data = [datetime.datetime.today().strftime('%Y%m%d%H%M%S'), RPMP, ecu.speed, ecu.coolantTemp, ecu.intakeTemp, ecu.MAF, ecu.throttlePosition, ecu.engineLoad, ecu.ltft1, ecu.ltft2, ecu.o2bs1s1, ecu.o2bs1s2, ecu.stft1, ecu.stft2, config.disposition]
       ##else long log mode -- this is pretty slow in iso-9141-2 (4 variable typical)
-      data = [datetime.datetime.today().strftime('%Y%m%d%H%M%S'), RPMP, ecu.speed, ecu.coolantTemp, ecu.intakeTemp, ecu.MAF, ecu.throttlePosition, ecu.engineLoad, ecu.ltft1, ecu.ltft2, ecu.o2bs1s1, ecu.o2bs1s2, ecu.stft1, ecu.stft2, config.disposition]
-      ##else long log mode -- this is pretty slow in iso-9141-2 (4 variable typical)
-      ##this mechanism may be self-defeated above, BUT a good placeholder
+      #data = [datetime.datetime.today().strftime('%Y%m%d%H%M%S'), RPMP, ecu.speed, ecu.coolantTemp, ecu.intakeTemp, ecu.MAF, ecu.throttlePosition, ecu.engineLoad, ecu.fit, ecu.frpd, ecu.fuelRate, ecu.ltft1, ecu.ltft2, ecu.o2bs1s1, ecu.o2bs1s2, ecu.o2Ltftb1, ecu.o2Ltftb2, ecu.o2Stftb1, ecu.o2Stftb2, ecu.stft1, ecu.stft2, config.disposition]
+
+      ##Log speed events based on the below thresholds
       if not config.debugFlag:
         log.updateLog(data)
         if ecu.speed > 110:
