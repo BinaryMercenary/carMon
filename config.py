@@ -8,6 +8,8 @@ import numpy as np
 logLength = 0
 dtc_iter = 0
 time_elapsed_since_last_action = 0
+tapTimer = 0
+tapCount = 0
 gui_test_time = 0
 lastSpeed = 0 #I may not need this var anymore
 
@@ -19,17 +21,22 @@ logIter = 1
 ## but higher value will have flash effect, especially with a padded rpm value
 carrier = 21 #ktb test value - cleanup qqq
 rpm_grads = 50
+tapTimerWindow = 900
+
 redline_rpm = 6450 #proper is300 value
 #for normal mode, be sure these match!
-redline_emu = 16383 #IMSB5010 http://www.imsapp.com/support.html max rpm=16383
+redline_emu = 6450
+#redline_emu = 16383 #IMSB5010 http://www.imsapp.com/support.html max rpm=16383
+
 rpm_weight = redline_rpm // rpm_grads
+i_have_an_emu_and_might_use_it = True
 #splash_img = "b2f-480x320.png"
 splash_rate = 2500
 log_rate = 1000
 dbg_rate = 0
 ## change the above dbg value for faster/slower playback
 ## otherwise, it is log_rate // logLength
-disposition = "Feet stuck, can't move"
+disposition = "No P0440. 1 Inc. Stock AF. Warren Axle Back."
 
 #### <Debug flag pairs
 ## Normal mode
@@ -53,13 +60,14 @@ exitOnDebug = False
 ecuReady = False
 settingsFlag = False
 
-## Inits to True (when piTFT is used)
-## basically means "FULLSCREEN" if true...
-piTFT = False
-#piTFT = True
+## Inits to True (when fullscreen is used)
+fullscreen = True
 ##gogoGadgetGUI = False
 gogoGadgetGUI = True
 #ktb unc# gogoGadgetGUI = True
+
+logMetrics = True
+deepMetrics = False
 
 ##Flag to print via obd call 0100
 printCommands = True
@@ -70,8 +78,11 @@ autoclearSDTC = False #uses 04: Clear DTCs and Freeze data
 #Strings
 startTime = datetime.datetime.today().strftime('%Y%m%d%H%M%S')
 ##elm327 bluetooth reliability is not too hot... ktb9 branch this out and or try high version for odb lib
-elmDev = "/dev/rfcomm0"
-#elmDev = "/dev/ttyUSB0"
+elmDev = "/dev/ttyUSB0"
+elmAlt = "/dev/rfcomm0"
+#The above setup assumes USB is primary device, and if absent, elmAlt is the standin
+#Since we gratuitously bind rfcomm0, ttyUSB is the safe/logical primary as ecu.py is written
+
 ####for rfcomm, from the cli:
 ##bluetoothctl
 ###scan on
@@ -90,15 +101,15 @@ dtc_inc = 0 #use 0600: Supported MIDs [01-20]
 currentdtc = []
 selectdtc = ["P0440"]
 #selectdtc = ["P0440", "P0446"]
-lcd = [0,0,0,0,0,0.11,0,0,0,222]
-dumbLog = lcd
+metrics = [0,0,0,0,0,0.11,0,0,0,222]
+dummyMetrics = metrics
 
-### ktb2 attn to piTFT RESOLUTION
+### ktb2 attn to fullscreen RESOLUTION
 ## Screen settings
 RESOLUTION = (480, 320)
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
-
+ORANGE = (255,112,00)
 
 ##M3 specific, tbd
 # LUT representing the speeds at each of the five gears. Each entry is +200 RPM, and is directly linked to rpmList.

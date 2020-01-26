@@ -1,5 +1,5 @@
 #!/usr/bin/python
-import config, time
+import config, time, sys, os
 from threading import Thread
 import obd
 import numpy as np
@@ -21,11 +21,24 @@ gear = 0
 connection = None
 dtc = None
 rpm_gauge = 0
+fit = -1
+frpd = -1
+fuelRate = -1
+ltft1 = -1
+ltft2 = -1
+o2bs1s1 = -1
+o2bs1s2 = -1
+o2Ltftb1 = -1
+o2Ltftb2 = -1
+o2Stftb1 = -1
+o2Stftb2 = -1
+stft1 = -1
+stft2 = -1
 ## this value may belong in config
 ## it is a delay meant to reduce over polling of the ecu
 ## since we only see sparse updates every 1.25 seconds (avg 2.125s bulk)
 ## ktb1 testing if this will improve bluetooth stability - tho errors just need more handling
-inECUdelay = 0.025
+inECUdelay = 0.001
 
 # Function to figure out what tach image we should display based on the RPM.
 def getTach():
@@ -80,8 +93,19 @@ class ecuThread(Thread):
     # DEBUG: Set debug logging so we can see everything that is happening.
     obd.logger.setLevel(obd.logging.DEBUG)
 
+    # (weakly) Validate elmDevice has been attached to kernel
+    try:
+      os.stat(config.elmDev)
+    except:
+      config.elmDev = config.elmAlt
+  
     # Connect to the ECU.
-    connection = obd.Async(config.elmDev, 115200, "3", fast=False)
+    try:
+      connection = obd.Async(config.elmDev, 115200, "3", fast=False)
+    except:
+      print "INFO: 404 - Bluetooth or USB may not be connected?"
+      config.tapCount = 404
+      sys.exit()
 
   # Watch everything we care about.
    ## what happens of we "Care" too much?  M-VCI even warns 5 param... ktb3 to test reduced list pls
@@ -97,15 +121,54 @@ class ecuThread(Thread):
     ##Also of intersting note, when the connection dies, last value returns and logs endlessly
     ##There is also an issue that calling DTCs with a tap event currently crashes the routines ktb3
     connection.watch(obd.commands.RPM, callback=self.new_rpm)
-    connection.watch(obd.commands.SPEED, callback=self.new_speed)
-    connection.watch(obd.commands.COOLANT_TEMP, callback=self.new_coolant_temp)
-    connection.watch(obd.commands[0x01][0x05], callback=self.new_coolant_temp)
-    connection.watch(obd.commands.INTAKE_TEMP, callback=self.new_intake_temp)
     connection.watch(obd.commands.MAF, callback=self.new_MAF)
+    connection.watch(obd.commands.INTAKE_TEMP, callback=self.new_intake_temp)
+    connection.watch(obd.commands.SPEED, callback=self.new_speed)
     connection.watch(obd.commands.THROTTLE_POS, callback=self.new_throttle_position)
     connection.watch(obd.commands.ENGINE_LOAD, callback=self.new_engine_load)
-    connection.watch(obd.commands.GET_DTC, callback=self.new_dtc)
-    
+    connection.watch(obd.commands[0x01][0x05], callback=self.new_coolant_temp)
+    #connection.watch(obd.commands.COOLANT_TEMP, callback=self.new_coolant_temp)
+    #connection.watch(obd.commands.GET_DTC, callback=self.new_dtc)
+
+    if config.deepMetrics:
+      connection.watch(obd.commands.TIMING_ADVANCE, callback=self.new_timing_advance)
+      ##no support on 2001 is300+elm327## connection.watch(obd.commands.FUEL_INJECT_TIMING, callback=self.new_fuel_inject_timing)
+
+      connection.watch(obd.commands.SHORT_FUEL_TRIM_1, callback=self.new_short_fuel_trim_1)
+      connection.watch(obd.commands.SHORT_FUEL_TRIM_2, callback=self.new_short_fuel_trim_2)
+
+      #IF ecu puts out high rpms, assume its an emulator, and assume that emu should not call ltft
+      if rpm > -1 and rpm < 9999:
+        connection.watch(obd.commands.LONG_FUEL_TRIM_1, callback=self.new_long_fuel_trim_1)
+        connection.watch(obd.commands.LONG_FUEL_TRIM_2, callback=self.new_long_fuel_trim_2)
+      else:
+        ltft1 = -2
+        ltft2 = -2
+
+      #Else return dummy -1 values
+      #...
+
+      connection.watch(obd.commands.O2_B1S1, callback=self.new_o2_b1s1)
+      connection.watch(obd.commands.O2_B1S2, callback=self.new_o2_b1s2)
+
+      ##no support on 2001 is300+elm327## connection.watch(obd.commands.SHORT_O2_TRIM_B1, callback=self.new_short_o2_trim_b1)
+      ##no support on 2001 is300+elm327## connection.watch(obd.commands.SHORT_O2_TRIM_B2, callback=self.new_short_o2_trim_b2)
+
+      ##no support on 2001 is300+elm327## connection.watch(obd.commands.LONG_O2_TRIM_B1, callback=self.new_long_o2_trim_b1)
+      ##no support on 2001 is300+elm327## connection.watch(obd.commands.LONG_O2_TRIM_B2, callback=self.new_long_o2_trim_b2)
+
+      ##no support on 2001 is300+elm327## connection.watch(obd.commands.FUEL_RAIL_PRESSURE_DIRECT, callback=self.new_fuel_rail_pressure_direct)
+      ##no support on 2001 is300+elm327## connection.watch(obd.commands.FUEL_RATE, callback=self.new_fuel_rate)
+
+
+    ##Thanks again Danny @ Ratchets And Wrenches - u rock https://youtu.be/pIJdCZgEiys
+    #short term fuel trim percent will increase of your o2 sensor goes low (lean)
+    #long term fuel trim percent will increase gradually as short term fuel trim percent trends
+    #stft s/b ~+/-3%,
+    #ltft s/b ~+/-3%,
+    #sum of ltft + stft sb under ~+/-10%
+
+
     ## ktb2 - would it be safer to clear this at idle/acc mode (only)???
     #config.autoclearSDTC = True
     #config.currentdtc = [""]
@@ -209,4 +272,71 @@ class ecuThread(Thread):
   def new_dtc(self, r):
     global dtc
     dtc = r.value
+
+  def new_fuel_inject_timing(self, r):
+    time.sleep(inECUdelay)
+    global fit
+    fit = r.value
+
+  def new_short_fuel_trim_1(self, r):
+    time.sleep(inECUdelay)
+    global stft1
+    stft1 = r.value
+
+  def new_short_fuel_trim_2(self, r):
+    time.sleep(inECUdelay)
+    global stft2
+    stft2 = r.value
+
+  def new_long_fuel_trim_1(self, r):
+    time.sleep(inECUdelay)
+    global ltft1
+    ltft1 = r.value
+
+  def new_long_fuel_trim_2(self, r):
+    time.sleep(inECUdelay)
+    global ltft2
+    ltft2 = r.value
+
+  def new_o2_b1s1(self, r):
+    time.sleep(inECUdelay)
+    global o2bs1s1
+    o2bs1s1 = r.value
+
+  def new_o2_b1s2(self, r):
+    time.sleep(inECUdelay)
+    global o2bs1s2
+    o2bs1s2 = r.value
+
+  def new_short_o2_trim_b1(self, r):
+    time.sleep(inECUdelay)
+    global o2Stftb1
+    o2Stftb1 = r.value
+
+  def new_short_o2_trim_b2(self, r):
+    time.sleep(inECUdelay)
+    global o2Stftb2
+    o2Stftb2 = r.value
+
+  def new_long_o2_trim_b1(self, r):
+    time.sleep(inECUdelay)
+    global o2Ltftb1
+    o2Ltftb1 = r.value
+
+  def new_long_o2_trim_b2(self, r):
+    time.sleep(inECUdelay)
+    global o2Ltftb2
+    o2Ltftb2 = r.value
+
+  def new_fuel_rail_pressure_direct(self, r):
+    time.sleep(inECUdelay)
+    global frpd
+    frpd = r.value
+
+  def new_fuel_rate(self, r):
+    time.sleep(inECUdelay)
+    global fuelRate
+    fuelRate = r.value
+
+
 
