@@ -183,6 +183,7 @@ while True:
       drawText(str(ecu.coolantTemp) + "\xb0", -160, 105, "readout") #"\xb0C" adding work - Need config.ktb C/F (hack - grab left 3 in to.string qqq??)
       drawText("Coolant", -170, 140, "label")
 
+      #ktb4 add an "exiting..." string like this when triple tapped
       #ktb9 overload/rewrite drawText to handle color?
       if config.deepMetrics:
         string = str(len(data)) + " PIDs"
