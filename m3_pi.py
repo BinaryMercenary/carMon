@@ -43,14 +43,14 @@ background_dir = 'tach/'
 background_files = ['%i.png' % i for i in range(0, config.rpm_grads + 1)]
 ground = [pygame.image.load(os.path.join("/home/pi/carMon/images/", file)) for file in background_files]
 
-# Load the M3 PI image.
+# Load the Logo image.
 try:
     img = pygame.image.load(imgdir + "logo-"  + str(config.dtc_error)  + str(config.dtc_pending)  + str(config.dtc_inc) + ".png")
 except pygame.error:
     img = pygame.image.load(imgdir + "logo-330.png")
 img_button = img.get_rect(topleft = (135, 220))
 
-# Load the M3 PI image.
+# Load the Logo image.
 splasher = pygame.image.load("/home/pi/carMon/images/b2f-480x320.png")
 
 # Set up the window.If fullscreen flag is set, set up the window for the screen.Else create it normally for use on normal monitor.

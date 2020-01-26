@@ -1,5 +1,5 @@
 #!/usr/bin/python
-import config, time, sys
+import config, time, sys, os
 from threading import Thread
 import obd
 import numpy as np
@@ -93,11 +93,18 @@ class ecuThread(Thread):
     # DEBUG: Set debug logging so we can see everything that is happening.
     obd.logger.setLevel(obd.logging.DEBUG)
 
+    # (weakly) Validate elmDevice has been attached to kernel
+    try:
+      os.stat(config.elmDev)
+    except:
+      config.elmDev = config.elmAlt
+  
     # Connect to the ECU.
     try:
       connection = obd.Async(config.elmDev, 115200, "3", fast=False)
     except:
-      print "Bluetooth or USB may not be connected?"
+      print "INFO: 404 - Bluetooth or USB may not be connected?"
+      config.tapCount = 404
       sys.exit()
 
   # Watch everything we care about.

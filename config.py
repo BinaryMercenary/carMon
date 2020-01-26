@@ -80,8 +80,11 @@ autoclearSDTC = False #uses 04: Clear DTCs and Freeze data
 #Strings
 startTime = datetime.datetime.today().strftime('%Y%m%d%H%M%S')
 ##elm327 bluetooth reliability is not too hot... ktb9 branch this out and or try high version for odb lib
-elmDev = "/dev/rfcomm0"
-#elmDev = "/dev/ttyUSB0"
+elmDev = "/dev/ttyUSB0"
+elmAlt = "/dev/rfcomm0"
+#The above setup assumes USB is primary device, and if absent, elmAlt is the standin
+#Since we gratuitously bind rfcomm0, ttyUSB is the safe/logical primary as ecu.py is written
+
 ####for rfcomm, from the cli:
 ##bluetoothctl
 ###scan on
