@@ -139,10 +139,10 @@ while True:
       # Print all the DTCs
       if ecu.dtc:
         for code, desc in ecu.dtc:
-          drawText(code, 0, -80 + (dtc_iter * 50), "label")
-          dtc_iter += 1
-          if dtc_iter == len(dtc):
-            dtc_iter = 0
+          drawText(code, 0, -80 + (config.dtc_iter * 50), "label")
+          config.dtc_iter += 1
+          if config.dtc_iter == len(ecu.dtc):
+            config.dtc_iter = 0
       else :
         windowSurface.blit(splasher, (0,0))
         drawText("No DTCs found", 140, 140, "label")

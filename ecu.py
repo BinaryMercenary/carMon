@@ -81,11 +81,13 @@ def calcGear(rpm, speed):
 class ecuThread(Thread):
   def __init__(self):
     Thread.__init__(self)
+    #ktb2 maybe add a try here to handle the crashes?
     self.daemon = True
     self.start()
 
   def run(self):
     #time.sleep(inECUdelay)#
+    #ktb2 maybe add a try here to handle the crashes?
     global connection
     ports = obd.scan_serial()
     print ports
@@ -128,7 +130,7 @@ class ecuThread(Thread):
     connection.watch(obd.commands.ENGINE_LOAD, callback=self.new_engine_load)
     connection.watch(obd.commands[0x01][0x05], callback=self.new_coolant_temp)
     #connection.watch(obd.commands.COOLANT_TEMP, callback=self.new_coolant_temp)
-    #connection.watch(obd.commands.GET_DTC, callback=self.new_dtc)
+    connection.watch(obd.commands.GET_DTC, callback=self.new_dtc)
 
     if config.deepMetrics:
       connection.watch(obd.commands.TIMING_ADVANCE, callback=self.new_timing_advance)
@@ -183,6 +185,7 @@ class ecuThread(Thread):
       print " vvvv populated value"
       print clearDTC
       print "log these resets, pls - ktb2 - <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"
+      os.system('echo "(DTC) AUTOCLEARED select DTC(s) `date +%Y-%m-%d-%H%M.%S`" >> ../logs/INFO.`date +%Y-%m-%d-%H%M`.DTC.LOG')
 
 
     # Start the connection.
