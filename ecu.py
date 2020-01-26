@@ -1,5 +1,5 @@
 #!/usr/bin/python
-import config, time
+import config, time, sys
 from threading import Thread
 import obd
 import numpy as np
@@ -94,7 +94,11 @@ class ecuThread(Thread):
     obd.logger.setLevel(obd.logging.DEBUG)
 
     # Connect to the ECU.
-    connection = obd.Async(config.elmDev, 115200, "3", fast=True)
+    try:
+      connection = obd.Async(config.elmDev, 115200, "3", fast=False)
+    except:
+      print "Bluetooth or USB may not be connected?"
+      sys.exit()
 
   # Watch everything we care about.
    ## what happens of we "Care" too much?  M-VCI even warns 5 param... ktb3 to test reduced list pls

@@ -27,10 +27,10 @@ def drawText(string, x, y, font):
 # Connect to the ECU.
 if not config.debugFlag:
     try:
-      ecu.ecuThread()
+      launchy = ecu.ecuThread()
     except:
       #shoot, this doesn't work -- you need some kind of watchdog or sth tricky ktb5
-      print "It's just too much, I can't handle it anymore -- Wifey"
+      print "It's just too much, I can't handle it anymore -- anon"
       sys.exit()
 
     # Give time for the ECU to connect before we start the GUI.
@@ -54,8 +54,8 @@ img_button = img.get_rect(topleft = (135, 220))
 splasher = pygame.image.load("/home/pi/carMon/images/b2f-480x320.png")
 
 # Set up the window.If fullscreen flag is set, set up the window for the screen.Else create it normally for use on normal monitor.
-##ktb9 it would be pretty dope to drive this LIVE via a gpio pin and a switch
 ##small screen + fullscreen
+## I was going to assigned two-taps to toggle fullscreen BUT why? Exit is better
 if config.fullscreen:
     os.putenv('SDL_FBDEV', '/dev/fb1')
     pygame.init()
@@ -95,20 +95,28 @@ if  config.debugFlag:
 # Run the game loop
 while True:
     for event in pygame.event.get():
-      if event.type == QUIT:
+      if event.type == MOUSEBUTTONDOWN:
+        #Toggle the settings flag when the screen is touched.
+        config.settingsFlag = not config.settingsFlag
+        config.tapCount += 1
+        # kb events splash mode -- playback the dummy/debug file again
+        #
+        ## This is working as expected now
+        config.debugFlag = True
+      if event.type == QUIT or config.tapCount > 2:
         #Rename our CSV to include end time.
         log.closeLog()
         # Close the connection to the ECU.
         ecu.connection.close()
         pygame.quit()
         sys.exit()
-      if event.type == MOUSEBUTTONDOWN:
-        #Toggle the settings flag when the screen is touched.
-        config.settingsFlag = not config.settingsFlag
-        # kb events splash mode -- playback the dummy/debug file again
-        #
-        ## this is horrible ktb broke second tap - needs logic around try: loglength
-        config.debugFlag = True
+
+    if config.tapTimer > config.tapTimerWindow:
+      if config.tapCount == 2:
+        print "Do something, will ya?" #ktb10 not sure what a double tap will do best
+        #https://www.pygame.org/wiki/toggle_fullscreen?parent=CookBook pygame.display.toggle fullscreen ? Nah.
+      config.tapTimer = 0
+      config.tapCount = 0
 
     if not config.debugFlag:
       #Figure out what tach image should be.
@@ -120,7 +128,7 @@ while True:
     # Clear the screen
     windowSurface.fill(config.BLACK)
 
-    # Load the M3 logo
+    # Load your logo
     windowSurface.blit(img, (windowSurface.get_rect().centerx - 105, windowSurface.get_rect().centery + 60))
     # If the settings button has been pressed:
     if (config.settingsFlag):
@@ -138,6 +146,8 @@ while True:
     else :
       #Calculate coordinates so tachometer is in middle of screen. (gross)
       coords = (windowSurface.get_rect().centerx - 200, windowSurface.get_rect().centery - 200)
+
+
 
       # Load the tach image
       if ecu.tach_iter >= 0:
@@ -259,11 +269,12 @@ while True:
 
 
     ##ktb3 8 seconds for screen only. 18 seconds with other metrics - need more RT.
-    ##seems some part of the code is delaying reads 
+    ##seems some part of the code is delaying reads
     ##If it is not this, then what???
 
     config.time_elapsed_since_last_action += dt
     config.gui_test_time += dt
+    config.tapTimer += dt
 
     # Do logs per the specified asynch interval
     if config.time_elapsed_since_last_action > config.log_rate and config.logMetrics:
@@ -303,8 +314,5 @@ while True:
       config.time_elapsed_since_last_action = 0
     # draw the window onto the screen
     pygame.display.update()
-
-
-
 
 

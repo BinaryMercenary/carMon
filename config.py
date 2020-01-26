@@ -8,6 +8,8 @@ import numpy as np
 logLength = 0
 dtc_iter = 0
 time_elapsed_since_last_action = 0
+tapTimer = 0
+tapCount = 0
 gui_test_time = 0
 lastSpeed = 0 #I may not need this var anymore
 
@@ -19,6 +21,7 @@ logIter = 1
 ## but higher value will have flash effect, especially with a padded rpm value
 carrier = 21 #ktb test value - cleanup qqq
 rpm_grads = 50
+tapTimerWindow = 900
 
 redline_rpm = 6450 #proper is300 value
 #for normal mode, be sure these match!
