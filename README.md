@@ -1,4 +1,6 @@
 # carMon
+  ATTN - runs fullscreen by default - triple click or triple tap to exit the app.
+
   Fork of Geoffrey Wacker's (GW) Cal Poly SLO project, initially for M3 but will be adapting to IS300 and making more generic/portable as time permits.
 (See https://digitalcommons.calpoly.edu/cpesp/235)
 
@@ -35,4 +37,3 @@ ISO 14230-4 KWP (fast init, 10.4 kbit/s)           <- tbd - contemparary to ISO 
 
 See excerpt ./library/tbd_powertrain.api
 
-on other lines -- tbd how to swipe for exit using pygame
