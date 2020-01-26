@@ -61,14 +61,12 @@ ecuReady = False
 settingsFlag = False
 
 ## Inits to True (when fullscreen is used)
-fullscreen = False
-#fullscreen = True
+fullscreen = True
 ##gogoGadgetGUI = False
 gogoGadgetGUI = True
 #ktb unc# gogoGadgetGUI = True
 
 logMetrics = True
-deepMetrics = True
 deepMetrics = False
 
 ##Flag to print via obd call 0100
@@ -111,7 +109,7 @@ dummyMetrics = metrics
 RESOLUTION = (480, 320)
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
-
+ORANGE = (255,112,00)
 
 ##M3 specific, tbd
 # LUT representing the speeds at each of the five gears. Each entry is +200 RPM, and is directly linked to rpmList.

@@ -11,6 +11,7 @@ RPMP = 0;
 #this is part of the repo and there for NOT in config
 imgdir = "/home/pi/carMon/images/"
 
+
 #Helper function to draw the given string at coordinate x, y, relative to center.
 def drawText(string, x, y, font):
   if font == "readout":
@@ -114,6 +115,8 @@ while True:
     if config.tapTimer > config.tapTimerWindow:
       if config.tapCount == 2:
         print "Do something, will ya?" #ktb10 not sure what a double tap will do best
+        #Toggle to deeper metrics will suffice for now
+        config.deepMetrics = not config.deepMetrics
         #https://www.pygame.org/wiki/toggle_fullscreen?parent=CookBook pygame.display.toggle fullscreen ? Nah.
       config.tapTimer = 0
       config.tapCount = 0
@@ -179,6 +182,16 @@ while True:
       # Draw the coolant temp readout and label.
       drawText(str(ecu.coolantTemp) + "\xb0", -160, 105, "readout") #"\xb0C" adding work - Need config.ktb C/F (hack - grab left 3 in to.string qqq??)
       drawText("Coolant", -170, 140, "label")
+
+      #ktb9 overload/rewrite drawText to handle color?
+      if config.deepMetrics:
+        string = str(len(data)) + " PIDs"
+        text = labelFont.render(string, True, config.ORANGE)
+        textRect = text.get_rect()
+        textRect.centerx = windowSurface.get_rect().centerx + 0
+        textRect.centery = windowSurface.get_rect().centery + 140
+        windowSurface.blit(text, textRect)
+
 
       # Draw the intake temp readout and label.i
       drawText(str(ecu.intakeTemp) + "", 190, 105, "readout") #"\xb0C" not want - Need ecu.ktb3 routine for abs<>magn pass/set "-" or sth
@@ -284,15 +297,17 @@ while True:
       #RPMP
       RPMP = int(ecu.rpm*100/config.redline_rpm) #log as RPM Perentage
       ##this is too static, something dynamic at later time ktb8
-      ##ktb1 add if statement here to control
 
+      ##ktb1 add if statement here to control - this needs polling levels, still
       ##if fast screen mode then:
       ##LCD minimum
-      data = [datetime.datetime.today().strftime('%Y%m%d%H%M%S'), RPMP, ecu.speed, ecu.coolantTemp, ecu.intakeTemp, ecu.MAF, ecu.throttlePosition, ecu.engineLoad, config.disposition]
-      ##Good metrics for an  2001 is300#
-      #data = [datetime.datetime.today().strftime('%Y%m%d%H%M%S'), RPMP, ecu.speed, ecu.coolantTemp, ecu.intakeTemp, ecu.MAF, ecu.throttlePosition, ecu.engineLoad, ecu.ltft1, ecu.ltft2, ecu.o2bs1s1, ecu.o2bs1s2, ecu.stft1, ecu.stft2, config.disposition]
-      ##else long log mode -- this is pretty slow in iso-9141-2 (4 variable typical)
-      data = [datetime.datetime.today().strftime('%Y%m%d%H%M%S'), RPMP, ecu.speed, ecu.coolantTemp, ecu.intakeTemp, ecu.MAF, ecu.throttlePosition, ecu.engineLoad, ecu.fit, ecu.frpd, ecu.fuelRate, ecu.ltft1, ecu.ltft2, ecu.o2bs1s1, ecu.o2bs1s2, ecu.o2Ltftb1, ecu.o2Ltftb2, ecu.o2Stftb1, ecu.o2Stftb2, ecu.stft1, ecu.stft2, config.disposition]
+      if not config.deepMetrics:
+        data = [datetime.datetime.today().strftime('%Y%m%d%H%M%S'), RPMP, ecu.speed, ecu.coolantTemp, ecu.intakeTemp, ecu.MAF, ecu.throttlePosition, ecu.engineLoad, config.disposition]
+      else:
+        ##Good metrics for an  2001 is300#
+        data = [datetime.datetime.today().strftime('%Y%m%d%H%M%S'), RPMP, ecu.speed, ecu.coolantTemp, ecu.intakeTemp, ecu.MAF, ecu.throttlePosition, ecu.engineLoad, ecu.ltft1, ecu.ltft2, ecu.o2bs1s1, ecu.o2bs1s2, ecu.stft1, ecu.stft2, config.disposition]
+        ##else long log mode -- this is pretty slow in iso-9141-2 (4 variable typical)
+        #data = [datetime.datetime.today().strftime('%Y%m%d%H%M%S'), RPMP, ecu.speed, ecu.coolantTemp, ecu.intakeTemp, ecu.MAF, ecu.throttlePosition, ecu.engineLoad, ecu.fit, ecu.frpd, ecu.fuelRate, ecu.ltft1, ecu.ltft2, ecu.o2bs1s1, ecu.o2bs1s2, ecu.o2Ltftb1, ecu.o2Ltftb2, ecu.o2Stftb1, ecu.o2Stftb2, ecu.stft1, ecu.stft2, config.disposition]
 
       ##Log speed events based on the below thresholds
       if not config.debugFlag:
