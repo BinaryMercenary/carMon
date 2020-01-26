@@ -44,12 +44,27 @@ background_dir = 'tach/'
 background_files = ['%i.png' % i for i in range(0, config.rpm_grads + 1)]
 ground = [pygame.image.load(os.path.join("/home/pi/carMon/images/", file)) for file in background_files]
 
+if ecu.dtc:
+  config.dtc_error = len(ecu.dtc)
+else:
+  config.dtc_error = 0
+
+if ecu.pending:
+  config.dtc_pending = len(ecu.pending)
+else:
+  config.dtc_pending = 0
+
 # Load the Logo image.
 try:
     img = pygame.image.load(imgdir + "logo-"  + str(config.dtc_error)  + str(config.dtc_pending)  + str(config.dtc_inc) + ".png")
 except pygame.error:
     img = pygame.image.load(imgdir + "logo-330.png")
 img_button = img.get_rect(topleft = (135, 220))
+
+#this will need wrapped up better pls ktb
+#ktb1 config.dtc_inc need to be built
+#ktb2 wrap this with if not 0 0 0 later pls (sum them up)
+config.disposition = "CODES:" +  str(config.dtc_error)  + str(config.dtc_pending)  + str(config.dtc_inc)
 
 # Load the Logo image.
 splasher = pygame.image.load("/home/pi/carMon/images/b2f-480x320.png")
@@ -131,25 +146,44 @@ while True:
     # Clear the screen
     windowSurface.fill(config.BLACK)
 
+
+    ## the overwrite is in the ecu file ktb0
+    #ecu.pending = ecu.dtc #debug
     # Load your logo
     windowSurface.blit(img, (windowSurface.get_rect().centerx - 105, windowSurface.get_rect().centery + 60))
     # If the settings button has been pressed:
+    # #config.dtc_pending = 0
+    # #config.dtc_error = 0
     if (config.settingsFlag):
       drawText("Settings", -160, -145, "readout")
       # Print all the DTCs
-      if ecu.dtc:
-        for code, desc in ecu.dtc:
-          drawText(code, 0, -80 + (config.dtc_iter * 50), "label")
-          config.dtc_iter += 1
-          if config.dtc_iter == len(ecu.dtc):
-            config.dtc_iter = 0
+      ##debug method
+      #ecu.dtc = "P0440"
+      #if (ecu.dtc != None) or (ecu.pending != None):
+      if ecu.dtc or ecu.pending:
+        ##ktb0 de-debug
+        if ecu.pending:
+          #log.updateLog(dir(ecu.pending)) 
+          for codes, desc in ecu.pending:
+            drawText(codes, 120, -80 + (config.dtc_iter * 50), "label")
+            config.dtc_iter += 1
+            # #config.dtc_pending += 1
+            if config.dtc_iter == len(ecu.pending):
+              config.dtc_iter = 0
+        if ecu.dtc:
+          #log.updateLog(dir(ecu.dtc)) 
+          for codes, desc in ecu.dtc:
+            drawText(codes, -120, -80 + (config.dtc_iter * 50), "label")
+            config.dtc_iter += 1
+            # #config.dtc_error += 1
+            if config.dtc_iter == len(ecu.dtc):
+              config.dtc_iter = 0
       else :
         windowSurface.blit(splasher, (0,0))
         drawText("No DTCs found", 140, 140, "label")
     else :
       #Calculate coordinates so tachometer is in middle of screen. (gross)
       coords = (windowSurface.get_rect().centerx - 200, windowSurface.get_rect().centery - 200)
-
 
 
       # Load the tach image

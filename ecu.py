@@ -7,7 +7,8 @@ import numpy as np
 # Globals
 clearDTC = "DTC not cleared"
 commandsReturn = "Return a list of all commands"
-pending = "P9999"
+#pending = "P9999"
+pending = None
 rpm = 0
 speed = 0
 coolantTemp = 0
@@ -130,7 +131,21 @@ class ecuThread(Thread):
     connection.watch(obd.commands.ENGINE_LOAD, callback=self.new_engine_load)
     connection.watch(obd.commands[0x01][0x05], callback=self.new_coolant_temp)
     #connection.watch(obd.commands.COOLANT_TEMP, callback=self.new_coolant_temp)
-    connection.watch(obd.commands.GET_DTC, callback=self.new_dtc)
+    #this is an expensive call but is needed for my warning icons
+    #connection.watch(obd.commands.GET_DTC, callback=self.new_dtc)
+    connection.watch(obd.commands[0x03][0], callback=self.new_dtc)
+    connection.watch(obd.commands[0x07][0], callback=self.new_pending)
+    # #connection.watch(obd.commands[0x03][0], callback=self.new_pending)
+
+    ## ktb2 - would it be safer to clear this at idle/acc mode (only)???
+    #config.autoclearSDTC = True
+    #config.currentdtc = [""]
+    #config.selectdtc  = [""]
+    if config.autoclearSDTC and (config.currentdtc  == config.selectdtc):
+      connection.watch(obd.commands.CLEAR_DTC, callback=self.new_clearDTC)
+      config.disposition = "ATTN: DTC cleared"
+      print config.disposition
+      os.system('echo "(DTC) AUTOCLEARED select DTC(s) `date +%Y-%m-%d-%H%M.%S`" >> ../logs/INFO.`date +%Y-%m-%d-%H%M`.DTC.LOG')
 
     if config.deepMetrics:
       connection.watch(obd.commands.TIMING_ADVANCE, callback=self.new_timing_advance)
@@ -171,23 +186,6 @@ class ecuThread(Thread):
     #sum of ltft + stft sb under ~+/-10%
 
 
-    ## ktb2 - would it be safer to clear this at idle/acc mode (only)???
-    #config.autoclearSDTC = True
-    #config.currentdtc = [""]
-    #config.selectdtc  = [""]
-    if config.autoclearSDTC and (config.currentdtc  == config.selectdtc):
-      time.sleep(inECUdelay)
-      config.disposition = "ATTN: DTC cleared"
-      print "log these resets, pls - ktb2 - >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
-      print clearDTC
-      print " ^^^^ un-init value"
-      connection.watch(obd.commands.CLEAR_DTC, callback=self.new_clearDTC)
-      print " vvvv populated value"
-      print clearDTC
-      print "log these resets, pls - ktb2 - <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"
-      os.system('echo "(DTC) AUTOCLEARED select DTC(s) `date +%Y-%m-%d-%H%M.%S`" >> ../logs/INFO.`date +%Y-%m-%d-%H%M`.DTC.LOG')
-
-
     # Start the connection.
     connection.start()
 
@@ -201,13 +199,6 @@ class ecuThread(Thread):
     commandsReturn = r
     print "ktb2 tbd output type/format FOR GET~ALL - >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
     print commandsReturn
-
-  def new_pending(self, r):
-    time.sleep(inECUdelay)
-    global pending
-    pending = r
-    print "ktb2 tbd output type/format FOR PENDING - >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
-    print pending
 
   def new_clearDTC(self, r):
     time.sleep(inECUdelay)
@@ -272,8 +263,14 @@ class ecuThread(Thread):
     except:
       engineLoad = 0
 
+  def new_pending(self, r):
+    time.sleep(inECUdelay)
+    global pending
+    pending = r.value
+
   def new_dtc(self, r):
     global dtc
+    time.sleep(inECUdelay)
     dtc = r.value
 
   def new_fuel_inject_timing(self, r):
