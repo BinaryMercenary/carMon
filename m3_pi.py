@@ -257,6 +257,11 @@ while True:
     # Update the clock.
     dt = clock.tick()
 
+
+    ##ktb3 8 seconds for screen only. 18 seconds with other metrics - need more RT.
+    ##seems some part of the code is delaying reads 
+    ##If it is not this, then what???
+
     config.time_elapsed_since_last_action += dt
     config.gui_test_time += dt
 
@@ -276,7 +281,7 @@ while True:
       ##Good metrics for an  2001 is300#
       #data = [datetime.datetime.today().strftime('%Y%m%d%H%M%S'), RPMP, ecu.speed, ecu.coolantTemp, ecu.intakeTemp, ecu.MAF, ecu.throttlePosition, ecu.engineLoad, ecu.ltft1, ecu.ltft2, ecu.o2bs1s1, ecu.o2bs1s2, ecu.stft1, ecu.stft2, config.disposition]
       ##else long log mode -- this is pretty slow in iso-9141-2 (4 variable typical)
-      #data = [datetime.datetime.today().strftime('%Y%m%d%H%M%S'), RPMP, ecu.speed, ecu.coolantTemp, ecu.intakeTemp, ecu.MAF, ecu.throttlePosition, ecu.engineLoad, ecu.fit, ecu.frpd, ecu.fuelRate, ecu.ltft1, ecu.ltft2, ecu.o2bs1s1, ecu.o2bs1s2, ecu.o2Ltftb1, ecu.o2Ltftb2, ecu.o2Stftb1, ecu.o2Stftb2, ecu.stft1, ecu.stft2, config.disposition]
+      data = [datetime.datetime.today().strftime('%Y%m%d%H%M%S'), RPMP, ecu.speed, ecu.coolantTemp, ecu.intakeTemp, ecu.MAF, ecu.throttlePosition, ecu.engineLoad, ecu.fit, ecu.frpd, ecu.fuelRate, ecu.ltft1, ecu.ltft2, ecu.o2bs1s1, ecu.o2bs1s2, ecu.o2Ltftb1, ecu.o2Ltftb2, ecu.o2Stftb1, ecu.o2Stftb2, ecu.stft1, ecu.stft2, config.disposition]
 
       ##Log speed events based on the below thresholds
       if not config.debugFlag:

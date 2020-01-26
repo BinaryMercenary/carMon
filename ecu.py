@@ -94,7 +94,7 @@ class ecuThread(Thread):
     obd.logger.setLevel(obd.logging.DEBUG)
 
     # Connect to the ECU.
-    connection = obd.Async(config.elmDev, 115200, "3", fast=False)
+    connection = obd.Async(config.elmDev, 115200, "3", fast=True)
 
   # Watch everything we care about.
    ## what happens of we "Care" too much?  M-VCI even warns 5 param... ktb3 to test reduced list pls
@@ -110,54 +110,54 @@ class ecuThread(Thread):
     ##Also of intersting note, when the connection dies, last value returns and logs endlessly
     ##There is also an issue that calling DTCs with a tap event currently crashes the routines ktb3
     connection.watch(obd.commands.RPM, callback=self.new_rpm)
-    connection.watch(obd.commands.SPEED, callback=self.new_speed)
-    #connection.watch(obd.commands.COOLANT_TEMP, callback=self.new_coolant_temp)
-    connection.watch(obd.commands[0x01][0x05], callback=self.new_coolant_temp)
-    connection.watch(obd.commands.INTAKE_TEMP, callback=self.new_intake_temp)
     connection.watch(obd.commands.MAF, callback=self.new_MAF)
+    connection.watch(obd.commands.INTAKE_TEMP, callback=self.new_intake_temp)
+    connection.watch(obd.commands.SPEED, callback=self.new_speed)
     connection.watch(obd.commands.THROTTLE_POS, callback=self.new_throttle_position)
     connection.watch(obd.commands.ENGINE_LOAD, callback=self.new_engine_load)
-    connection.watch(obd.commands.GET_DTC, callback=self.new_dtc)
+    connection.watch(obd.commands[0x01][0x05], callback=self.new_coolant_temp)
+    #connection.watch(obd.commands.COOLANT_TEMP, callback=self.new_coolant_temp)
+    #connection.watch(obd.commands.GET_DTC, callback=self.new_dtc)
 
+    if config.deepMetrics:
+      connection.watch(obd.commands.TIMING_ADVANCE, callback=self.new_timing_advance)
+      ##no support on 2001 is300+elm327## connection.watch(obd.commands.FUEL_INJECT_TIMING, callback=self.new_fuel_inject_timing)
 
-    connection.watch(obd.commands.TIMING_ADVANCE, callback=self.new_timing_advance)
-    ##no support on 2001 is300+elm327## connection.watch(obd.commands.FUEL_INJECT_TIMING, callback=self.new_fuel_inject_timing)
+      connection.watch(obd.commands.SHORT_FUEL_TRIM_1, callback=self.new_short_fuel_trim_1)
+      connection.watch(obd.commands.SHORT_FUEL_TRIM_2, callback=self.new_short_fuel_trim_2)
 
-    connection.watch(obd.commands.SHORT_FUEL_TRIM_1, callback=self.new_short_fuel_trim_1)
-    connection.watch(obd.commands.SHORT_FUEL_TRIM_2, callback=self.new_short_fuel_trim_2)
+      #IF ecu puts out high rpms, assume its an emulator, and assume that emu should not call ltft
+      if rpm > -1 and rpm < 9999:
+        connection.watch(obd.commands.LONG_FUEL_TRIM_1, callback=self.new_long_fuel_trim_1)
+        connection.watch(obd.commands.LONG_FUEL_TRIM_2, callback=self.new_long_fuel_trim_2)
+      else:
+        ltft1 = -2
+        ltft2 = -2
 
-    #IF ecu puts out high rpms, assume its an emulator, and assume that emu should not call ltft 
-    if rpm > -1 and rpm < 9999:
-      connection.watch(obd.commands.LONG_FUEL_TRIM_1, callback=self.new_long_fuel_trim_1)
-      connection.watch(obd.commands.LONG_FUEL_TRIM_2, callback=self.new_long_fuel_trim_2)
-    else:
-      ltft1 = -2
-      ltft2 = -2
- 
-    #Else return dummy -1 values
-    #...
+      #Else return dummy -1 values
+      #...
 
-    connection.watch(obd.commands.O2_B1S1, callback=self.new_o2_b1s1)
-    connection.watch(obd.commands.O2_B1S2, callback=self.new_o2_b1s2)
+      connection.watch(obd.commands.O2_B1S1, callback=self.new_o2_b1s1)
+      connection.watch(obd.commands.O2_B1S2, callback=self.new_o2_b1s2)
 
-    ##no support on 2001 is300+elm327## connection.watch(obd.commands.SHORT_O2_TRIM_B1, callback=self.new_short_o2_trim_b1)
-    ##no support on 2001 is300+elm327## connection.watch(obd.commands.SHORT_O2_TRIM_B2, callback=self.new_short_o2_trim_b2)
+      ##no support on 2001 is300+elm327## connection.watch(obd.commands.SHORT_O2_TRIM_B1, callback=self.new_short_o2_trim_b1)
+      ##no support on 2001 is300+elm327## connection.watch(obd.commands.SHORT_O2_TRIM_B2, callback=self.new_short_o2_trim_b2)
 
-    ##no support on 2001 is300+elm327## connection.watch(obd.commands.LONG_O2_TRIM_B1, callback=self.new_long_o2_trim_b1)
-    ##no support on 2001 is300+elm327## connection.watch(obd.commands.LONG_O2_TRIM_B2, callback=self.new_long_o2_trim_b2)
+      ##no support on 2001 is300+elm327## connection.watch(obd.commands.LONG_O2_TRIM_B1, callback=self.new_long_o2_trim_b1)
+      ##no support on 2001 is300+elm327## connection.watch(obd.commands.LONG_O2_TRIM_B2, callback=self.new_long_o2_trim_b2)
 
-    ##no support on 2001 is300+elm327## connection.watch(obd.commands.FUEL_RAIL_PRESSURE_DIRECT, callback=self.new_fuel_rail_pressure_direct)
-    ##no support on 2001 is300+elm327## connection.watch(obd.commands.FUEL_RATE, callback=self.new_fuel_rate)
+      ##no support on 2001 is300+elm327## connection.watch(obd.commands.FUEL_RAIL_PRESSURE_DIRECT, callback=self.new_fuel_rail_pressure_direct)
+      ##no support on 2001 is300+elm327## connection.watch(obd.commands.FUEL_RATE, callback=self.new_fuel_rate)
 
 
     ##Thanks again Danny @ Ratchets And Wrenches - u rock https://youtu.be/pIJdCZgEiys
     #short term fuel trim percent will increase of your o2 sensor goes low (lean)
     #long term fuel trim percent will increase gradually as short term fuel trim percent trends
-    #stft s/b ~+/-3%, 
-    #ltft s/b ~+/-3%, 
+    #stft s/b ~+/-3%,
+    #ltft s/b ~+/-3%,
     #sum of ltft + stft sb under ~+/-10%
 
-    
+
     ## ktb2 - would it be safer to clear this at idle/acc mode (only)???
     #config.autoclearSDTC = True
     #config.currentdtc = [""]
@@ -326,4 +326,6 @@ class ecuThread(Thread):
     time.sleep(inECUdelay)
     global fuelRate
     fuelRate = r.value
+
+
 
