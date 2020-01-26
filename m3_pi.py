@@ -44,27 +44,6 @@ background_dir = 'tach/'
 background_files = ['%i.png' % i for i in range(0, config.rpm_grads + 1)]
 ground = [pygame.image.load(os.path.join("/home/pi/carMon/images/", file)) for file in background_files]
 
-if ecu.dtc:
-  config.dtc_error = len(ecu.dtc)
-else:
-  config.dtc_error = 0
-
-if ecu.pending:
-  config.dtc_pending = len(ecu.pending)
-else:
-  config.dtc_pending = 0
-
-# Load the Logo image.
-try:
-    img = pygame.image.load(imgdir + "logo-"  + str(config.dtc_error)  + str(config.dtc_pending)  + str(config.dtc_inc) + ".png")
-except pygame.error:
-    img = pygame.image.load(imgdir + "logo-330.png")
-img_button = img.get_rect(topleft = (135, 220))
-
-#this will need wrapped up better pls ktb
-#ktb1 config.dtc_inc need to be built
-#ktb2 wrap this with if not 0 0 0 later pls (sum them up)
-config.disposition = "CODES:" +  str(config.dtc_error)  + str(config.dtc_pending)  + str(config.dtc_inc)
 
 # Load the Logo image.
 splasher = pygame.image.load("/home/pi/carMon/images/b2f-480x320.png")
@@ -110,6 +89,29 @@ if  config.debugFlag:
 
 # Run the game loop
 while True:
+    if ecu.dtc:
+      config.dtc_error = len(ecu.dtc)
+    else:
+      config.dtc_error = 0
+
+    if ecu.pending:
+      config.dtc_pending = len(ecu.pending)
+    else:
+      config.dtc_pending = 0
+
+    # Load the Logo image.
+    try:
+        img = pygame.image.load(imgdir + "logo-"  + str(config.dtc_error)  + str(config.dtc_pending)  + str(config.dtc_inc) + ".png")
+    except pygame.error:
+        img = pygame.image.load(imgdir + "logo-330.png")
+    img_button = img.get_rect(topleft = (135, 220))
+
+
+    #this will need wrapped up better pls ktb
+    #ktb1 config.dtc_inc need to be built
+    #ktb2 wrap this with if not 0 0 0 later pls (sum them up)
+    config.disposition = "CODES:" +  str(config.dtc_error)  + str(config.dtc_pending)  + str(config.dtc_inc)
+
     for event in pygame.event.get():
       if event.type == MOUSEBUTTONDOWN:
         #Toggle the settings flag when the screen is touched.
