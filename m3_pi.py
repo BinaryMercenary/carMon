@@ -133,6 +133,7 @@ while True:
       if config.tapCount == 2:
         print "Do something, will ya?" #ktb10 not sure what a double tap will do best
         #Toggle to deeper metrics will suffice for now
+        #ktb26# config.deepMetrics = not config.deepMetrics
         config.deepMetrics = not config.deepMetrics
         #https://www.pygame.org/wiki/toggle_fullscreen?parent=CookBook pygame.display.toggle fullscreen ? Nah.
       config.tapTimer = 0
@@ -218,17 +219,6 @@ while True:
       # Draw the coolant temp readout and label.
       drawText(str(ecu.coolantTemp) + "\xb0", -160, 105, "readout") #"\xb0C" adding work - Need config.ktb C/F (hack - grab left 3 in to.string qqq??)
       drawText("Coolant", -170, 140, "label")
-
-      #ktb4 add an "exiting..." string like this when triple tapped
-      #ktb9 overload/rewrite drawText to handle color?
-      if config.deepMetrics:
-        string = str(len(data)) + " PIDs"
-        text = labelFont.render(string, True, config.ORANGE)
-        textRect = text.get_rect()
-        textRect.centerx = windowSurface.get_rect().centerx + 0
-        textRect.centery = windowSurface.get_rect().centery + 140
-        windowSurface.blit(text, textRect)
-
 
       # Draw the intake temp readout and label.i
       drawText(str(ecu.intakeTemp) + "", 190, 105, "readout") #"\xb0C" not want - Need ecu.ktb3 routine for abs<>magn pass/set "-" or sth
@@ -346,6 +336,21 @@ while True:
         ##else long log mode -- this is pretty slow in iso-9141-2 (4 variable typical)
         #data = [datetime.datetime.today().strftime('%Y%m%d%H%M%S'), RPMP, ecu.speed, ecu.coolantTemp, ecu.intakeTemp, ecu.MAF, ecu.throttlePosition, ecu.engineLoad, ecu.fit, ecu.frpd, ecu.fuelRate, ecu.ltft1, ecu.ltft2, ecu.o2bs1s1, ecu.o2bs1s2, ecu.o2Ltftb1, ecu.o2Ltftb2, ecu.o2Stftb1, ecu.o2Stftb2, ecu.stft1, ecu.stft2, config.disposition]
 
+      #ktb11 note that adding text here will flash (badly)
+      #ktb4 add an "exiting..." string like this when triple tapped
+      #ktb9 overload/rewrite drawText to handle color?
+      #If I don't want this to flash I can move it back to the space between Cooland and Intake 
+      ##The logic here should be the opposite of the default mode, ktb3 tbd if I want 15 pids or 10.  *10 was fast on car vs emu.*
+      #if not config.deepMetrics:
+      if not config.deepMetrics:
+        string = str(len(data)) + " PIDs"
+        text = labelFont.render(string, True, config.CHARCOAL)
+        textRect = text.get_rect()
+        textRect.centerx = windowSurface.get_rect().centerx + 0
+        textRect.centery = windowSurface.get_rect().centery + 140
+        windowSurface.blit(text, textRect)
+
+
       ##Log speed events based on the below thresholds
       if not config.debugFlag:
         log.updateLog(data)
@@ -364,6 +369,7 @@ while True:
         #if ecu.temp.... #ktb4 log some AUDIT values for temperature or whatever
       # Reset time.
       config.time_elapsed_since_last_action = 0
+
     # draw the window onto the screen
     pygame.display.update()
 

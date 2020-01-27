@@ -3,6 +3,17 @@ import ecu
 import datetime
 import numpy as np
 
+##ktb0 hot ticket items:
+#auto launcher
+#fix graphic 310 010 etc
+#set bashr rc terminal to 56x14 chars for the 240x480 (in the .sh launcher)
+#ktb3 - road time needed!
+#why does P0440 show up as C0600??? (in 07/pending mode)
+#P0440 show up as C060 ALSO in in 03 mode?
+#ktb4 THEN You can test the auto-clear of SINGLE code
+#ktb 6 - INC status for the gray indicator discs
+#I'm afraid the emulator is not fullfilling it's role 100% here :/
+
 ##  Globals.
 ## Inits to 0
 logLength = 0
@@ -68,6 +79,7 @@ gogoGadgetGUI = True
 
 logMetrics = True
 deepMetrics = False
+deepMetrics = True
 
 ##Flag to print via obd call 0100
 printCommands = True
@@ -110,6 +122,7 @@ RESOLUTION = (480, 320)
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
 ORANGE = (255,112,00)
+CHARCOAL = (54,69,79)
 
 ##M3 specific, tbd
 # LUT representing the speeds at each of the five gears. Each entry is +200 RPM, and is directly linked to rpmList.
