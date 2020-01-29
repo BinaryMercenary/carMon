@@ -5,7 +5,6 @@ import numpy as np
 
 ##ktb0 hot ticket items:
 #auto launcher
-#fix graphic 310 010 etc
 #set bashr rc terminal to 56x14 chars for the 240x480 (in the .sh launcher)
 #ktb3 - road time needed!
 #why does P0440 show up as C0600??? (in 07/pending mode)
