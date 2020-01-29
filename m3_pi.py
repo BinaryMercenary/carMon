@@ -99,11 +99,18 @@ while True:
     else:
       config.dtc_pending = 0
 
+    #ktb1 I need to make the disposition string functions ALL += pls
+#    try:
+#      int(config.dtc_error)
+#        #if int(config.dtc_error) == 1 and config.dtc_error:
+#        if int(config.dtc_error) == 1:
+#          os.system('echo ` + ecu.dtc >> ../logs/DTC_CODES.LOG')
+
     # Load the Logo image.
     try:
-        img = pygame.image.load(imgdir + "logo-"  + str(config.dtc_error)  + str(config.dtc_pending)  + str(config.dtc_inc) + ".png")
+      img = pygame.image.load(imgdir + "logo-"  + str(config.dtc_error)  + str(config.dtc_pending)  + str(config.dtc_inc) + ".png")
     except pygame.error:
-        img = pygame.image.load(imgdir + "logo-330.png")
+      img = pygame.image.load(imgdir + "logo-330.png")
     img_button = img.get_rect(topleft = (135, 220))
 
 

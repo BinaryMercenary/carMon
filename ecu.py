@@ -141,11 +141,16 @@ class ecuThread(Thread):
     #config.autoclearSDTC = True
     #config.currentdtc = [""]
     #config.selectdtc  = [""]
-    if config.autoclearSDTC and (config.currentdtc  == config.selectdtc):
-      connection.watch(obd.commands.CLEAR_DTC, callback=self.new_clearDTC)
-      config.disposition = "ATTN: DTC cleared"
-      print config.disposition
-      os.system('echo "(DTC) AUTOCLEARED select DTC(s) `date +%Y-%m-%d-%H%M.%S`" >> ../logs/INFO.`date +%Y-%m-%d-%H%M`.DTC.LOG')
+    try:
+#     config.dtc_iter = int(config.dtc_error)
+      int(config.dtc_error) == 1
+      if config.autoclearSDTC and (config.currentdtc  == config.selectdtc):
+        connection.watch(obd.commands.CLEAR_DTC, callback=self.new_clearDTC)
+        config.disposition = "ATTN: DTC cleared"
+        print config.disposition
+        os.system('echo "(DTC) AUTOCLEARED select DTC(s) `date +%Y-%m-%d-%H%M.%S`" >> ../logs/INFO.`date +%Y-%m-%d-%H%M`.DTC.LOG')
+    except:
+      print "No clear permitted" 
 
     if config.deepMetrics:
       connection.watch(obd.commands.TIMING_ADVANCE, callback=self.new_timing_advance)
