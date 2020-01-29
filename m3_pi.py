@@ -379,17 +379,28 @@ while True:
       if ecu.pending:
         config.currentPending = ""
         for codes, desc in ecu.pending:
-          config.currentPending += codes
+          config.currentPending = str(config.currentPending) + str(codes)
           config.dtc_iter += 1
-          # #config.dtc_pending += 1
           if config.dtc_iter == len(ecu.pending):
             config.dtc_iter = 0
       if ecu.dtc:
         config.currentdtc = ""
         for codes, desc in ecu.dtc:
-          config.currentdtc += codes
+          config.currentdtc = str(config.currentdtc) + str(codes)
           config.dtc_iter += 1
-          # #config.dtc_error += 1
           if config.dtc_iter == len(ecu.dtc):
             config.dtc_iter = 0
+
+      #if config.currentdtc == config.selectdtc1:
+      config.autoclearSDTC = False
+      #ktb000 can't seem to operate on these
+      if len(config.currentdtc) == len(config.selectdtc1):
+        #ecu.clearECU = True
+       os.system("echo EQUAL Err-GETTINGLen=%i Err-EXPECTLen=%i Pen-GETTINGLen=%i Pen-EXPECTLen=%i >> ../logs/TEMP.DEBUG.LOG" % ((len(str(config.currentdtc))), (len(str(config.selectdtc1))), (len(str(config.currentPending))), (len(str(config.selectPending1) ))
+        config.autoclearSDTC = True
+      else:
+       print "ahm"
+       os.system("echo NOTeq Err-GETTINGLen=%i Err-EXPECTLen=%i Pen-GETTINGLen=%i Pen-EXPECTLen=%i >> ../logs/TEMP.DEBUG.LOG" % ((len(str(config.currentdtc))), (len(str(config.selectdtc1))), (len(str(config.currentPending))), (len(str(config.selectPending1) ))
+       #os.system("echo GETTINGLen=%i EXPECTLen=%i >> ../logs/TEMP.DTCS.LOG" % ((len(config.currentdtc)), (len(config.selectdtc1)))) 
+       #os.system("echo GETTINGLen=%s EXPECTLen=%s >> ../logs/TEMP.DTCS.LOG" % (str(len(config.currentdtc)), (str(len(config.selectdtc1)))) 
 

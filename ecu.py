@@ -7,6 +7,7 @@ import numpy as np
 # Globals
 clearDTC = "DTC not cleared"
 commandsReturn = "Return a list of all commands"
+clearECU = False
 #incompleteMon = None
 pending = None
 rpm = 0
@@ -138,11 +139,8 @@ class ecuThread(Thread):
     connection.watch(obd.commands[0x07][0], callback=self.new_pending)
     # #connection.watch(obd.commands[0x03][0], callback=self.new_pending)
 
-    # works # if config.autoclearSDTC:
-    #if (config.autoclearSDTC) and (str(config.currentdtc) == str(config.selectdtc1)):
-    if config.currentdtc == config.selectdtc1:
+    if config.autoclearSDTC:
       connection.watch(obd.commands.CLEAR_DTC, callback=self.new_clearDTC)
-      os.system('echo "(DTC) AUTOCLEARED select DTC(s) `date +%Y-%m-%d-%H%M.%S`" >> ../logs/INFO.`date +%Y-%m-%d-%H%M`.DTC.LOG')
 
     if config.deepMetrics:
       connection.watch(obd.commands.TIMING_ADVANCE, callback=self.new_timing_advance)
