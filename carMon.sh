@@ -4,7 +4,7 @@
 
 ## To start on boot, add this to line:
 ## @bash /home/pi/carMon/carMon.sh &
-## to 
+## to
 ## vi ~/.config/lxsession/LXDE-pi/autostart
 
 ## insert the MAC address of your bluetooth here (ktb7 see ...)
