@@ -99,12 +99,14 @@ while True:
     else:
       config.dtc_pending = 0
 
+    #if config.incompleteMon:
+    #  config.dtc_inc = len(ecu.incompleteMon)
+    #else:
+    #  config.dtc_inc = 0
+
+
+
     #ktb1 I need to make the disposition string functions ALL += pls
-#    try:
-#      int(config.dtc_error)
-#        #if int(config.dtc_error) == 1 and config.dtc_error:
-#        if int(config.dtc_error) == 1:
-#          os.system('echo ` + ecu.dtc >> ../logs/DTC_CODES.LOG')
 
     # Load the Logo image.
     try:
@@ -117,7 +119,7 @@ while True:
     #this will need wrapped up better pls ktb
     #ktb1 config.dtc_inc need to be built
     #ktb2 wrap this with if not 0 0 0 later pls (sum them up)
-    config.disposition = "CODES:" +  str(config.dtc_error)  + str(config.dtc_pending)  + str(config.dtc_inc)
+    config.disposition = config.disposition + "  CODES(" + str(config.dtc_error) + str(config.dtc_pending) + str(config.dtc_inc) + ") DTC(" + config.currentdtc + ") PEN(" + config.currentPending + ")"
 
     for event in pygame.event.get():
       if event.type == MOUSEBUTTONDOWN:
@@ -138,11 +140,10 @@ while True:
 
     if config.tapTimer > config.tapTimerWindow:
       if config.tapCount == 2:
-        print "Do something, will ya?" #ktb10 not sure what a double tap will do best
-        #Toggle to deeper metrics will suffice for now
-        #ktb26# config.deepMetrics = not config.deepMetrics
-        config.deepMetrics = not config.deepMetrics
+        ## let's do something on double tap
         #https://www.pygame.org/wiki/toggle_fullscreen?parent=CookBook pygame.display.toggle fullscreen ? Nah.
+        #Toggle to deeper metrics will suffice for now
+        config.deepMetrics = not config.deepMetrics
       config.tapTimer = 0
       config.tapCount = 0
 
@@ -157,35 +158,24 @@ while True:
     windowSurface.fill(config.BLACK)
 
 
-    ## the overwrite is in the ecu file ktb0
-    #ecu.pending = ecu.dtc #debug
     # Load your logo
     windowSurface.blit(img, (windowSurface.get_rect().centerx - 105, windowSurface.get_rect().centery + 60))
     # If the settings button has been pressed:
-    # #config.dtc_pending = 0
-    # #config.dtc_error = 0
     if (config.settingsFlag):
       drawText("Settings", -160, -145, "readout")
       # Print all the DTCs
       ##debug method
-      #ecu.dtc = "P0440"
-      #if (ecu.dtc != None) or (ecu.pending != None):
       if ecu.dtc or ecu.pending:
-        ##ktb0 de-debug
         if ecu.pending:
-          #log.updateLog(dir(ecu.pending)) 
           for codes, desc in ecu.pending:
             drawText(codes, 120, -80 + (config.dtc_iter * 50), "label")
             config.dtc_iter += 1
-            # #config.dtc_pending += 1
             if config.dtc_iter == len(ecu.pending):
               config.dtc_iter = 0
         if ecu.dtc:
-          #log.updateLog(dir(ecu.dtc)) 
           for codes, desc in ecu.dtc:
             drawText(codes, -120, -80 + (config.dtc_iter * 50), "label")
             config.dtc_iter += 1
-            # #config.dtc_error += 1
             if config.dtc_iter == len(ecu.dtc):
               config.dtc_iter = 0
       else :
@@ -325,8 +315,10 @@ while True:
 
     # Do logs per the specified asynch interval
     if config.time_elapsed_since_last_action > config.log_rate and config.logMetrics:
+      os.system("echo ERROR=%s PENDING=%s INCOMPLETE=%s >> ../logs/TEMP.DTCS.LOG" % (config.currentdtc, config.currentPending, config.currentIncomplete))
       #Log all of our Data.
       ##ktb4 I still need to do something with config.disposition for output AND proper population
+      config.disposition += config.buildInfo
       config.disposition = config.disposition.replace(',', '')
       #RPMP
       RPMP = int(ecu.rpm*100/config.redline_rpm) #log as RPM Perentage
@@ -340,23 +332,23 @@ while True:
       else:
         ##Good metrics for an  2001 is300#
         data = [datetime.datetime.today().strftime('%Y%m%d%H%M%S'), RPMP, ecu.speed, ecu.coolantTemp, ecu.intakeTemp, ecu.MAF, ecu.throttlePosition, ecu.engineLoad, ecu.ltft1, ecu.ltft2, ecu.o2bs1s1, ecu.o2bs1s2, ecu.stft1, ecu.stft2, config.disposition]
-        ##else long log mode -- this is pretty slow in iso-9141-2 (4 variable typical)
+        ##else long log mode -- this is pretty slow in iso-9141-2
         #data = [datetime.datetime.today().strftime('%Y%m%d%H%M%S'), RPMP, ecu.speed, ecu.coolantTemp, ecu.intakeTemp, ecu.MAF, ecu.throttlePosition, ecu.engineLoad, ecu.fit, ecu.frpd, ecu.fuelRate, ecu.ltft1, ecu.ltft2, ecu.o2bs1s1, ecu.o2bs1s2, ecu.o2Ltftb1, ecu.o2Ltftb2, ecu.o2Stftb1, ecu.o2Stftb2, ecu.stft1, ecu.stft2, config.disposition]
 
       #ktb11 note that adding text here will flash (badly)
       #ktb4 add an "exiting..." string like this when triple tapped
       #ktb9 overload/rewrite drawText to handle color?
-      #If I don't want this to flash I can move it back to the space between Cooland and Intake 
+      #If I don't want this to flash I can move it back to the space between Cooland and Intake
       ##The logic here should be the opposite of the default mode, ktb3 tbd if I want 15 pids or 10.  *10 was fast on car vs emu.*
-      #if not config.deepMetrics:
+      config.buildInfo = ""
       if not config.deepMetrics:
         string = str(len(data)) + " PIDs"
-        text = labelFont.render(string, True, config.CHARCOAL)
+        text = readoutFont.render(string, True, config.ORANGE)
         textRect = text.get_rect()
+      # flashes here
         textRect.centerx = windowSurface.get_rect().centerx + 0
         textRect.centery = windowSurface.get_rect().centery + 140
         windowSurface.blit(text, textRect)
-
 
       ##Log speed events based on the below thresholds
       if not config.debugFlag:
@@ -377,7 +369,27 @@ while True:
       # Reset time.
       config.time_elapsed_since_last_action = 0
 
+    ##truncate config.disposition
+    config.disposition = ""
     # draw the window onto the screen
     pygame.display.update()
 
+    #ecu.dtc = "P0440"
+    if ecu.dtc or ecu.pending:
+      if ecu.pending:
+        config.currentPending = ""
+        for codes, desc in ecu.pending:
+          config.currentPending += codes
+          config.dtc_iter += 1
+          # #config.dtc_pending += 1
+          if config.dtc_iter == len(ecu.pending):
+            config.dtc_iter = 0
+      if ecu.dtc:
+        config.currentdtc = ""
+        for codes, desc in ecu.dtc:
+          config.currentdtc += codes
+          config.dtc_iter += 1
+          # #config.dtc_error += 1
+          if config.dtc_iter == len(ecu.dtc):
+            config.dtc_iter = 0
 
