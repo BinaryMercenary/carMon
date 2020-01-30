@@ -36,11 +36,29 @@ o2Stftb1 = -1
 o2Stftb2 = -1
 stft1 = -1
 stft2 = -1
+cmd = ""
+response = ""
+edo = False
+eas = False
 ## this value may belong in config
 ## it is a delay meant to reduce over polling of the ecu
 ## since we only see sparse updates every 1.25 seconds (avg 2.125s bulk)
 ## ktb1 testing if this will improve bluetooth stability - tho errors just need more handling
 inECUdelay = 0.001
+
+def noclearCodes(edo,eas):
+  global clearECU
+  if dtc:
+    config.currentdtc = ""
+    for codes, desc in dtc:
+      config.currentdtc = str(config.currentdtc) + str(codes)
+      config.dtc_iter += 1
+      if config.dtc_iter == len(dtc):
+        config.dtc_iter = 0
+  if str(config.currentdtc) == str(config.selectdtc1):
+    # #connection.watch(obd.commands.CLEAR_DTC, callback=self.new_clearDTC)
+    connection.watch(obd.commands.CLEAR_DTC)
+
 
 # Function to figure out what tach image we should display based on the RPM.
 def getTach():
@@ -102,6 +120,7 @@ class ecuThread(Thread):
       os.stat(config.elmDev)
     except:
       config.elmDev = config.elmAlt
+      inECUdelay = 0.75
   
     # Connect to the ECU.
     try:
@@ -139,9 +158,13 @@ class ecuThread(Thread):
     connection.watch(obd.commands[0x07][0], callback=self.new_pending)
     # #connection.watch(obd.commands[0x03][0], callback=self.new_pending)
 
-    if config.autoclearSDTC:
+    os.system("echo 'THREADNING' DO=%i AS=%i >> ../logs/TEMP.DTCDBG.LOG" % ((config.autoclearECU), (config.autoclearSDTC)))
+    #ktb0 this is only run once when this loads... and a connection watch is NOT the way to do this...
+    if config.autoclearECU:
       connection.watch(obd.commands.CLEAR_DTC, callback=self.new_clearDTC)
 
+    ## Hey Kids! Python classes load vars like deepMetrics here ONCE during init
+    ## So, toggling config.deepMetrics later will not change ANYTHING... :| Beware.
     if config.deepMetrics:
       connection.watch(obd.commands.TIMING_ADVANCE, callback=self.new_timing_advance)
       ##no support on 2001 is300+elm327## connection.watch(obd.commands.FUEL_INJECT_TIMING, callback=self.new_fuel_inject_timing)
@@ -174,7 +197,7 @@ class ecuThread(Thread):
 
 
     ##Thanks again Danny @ Ratchets And Wrenches - u rock https://youtu.be/pIJdCZgEiys
-    #short term fuel trim percent will increase of your o2 sensor goes low (lean)
+    #short term fuel trim percent will increase if your o2 sensor goes low (lean)
     #long term fuel trim percent will increase gradually as short term fuel trim percent trends
     #stft s/b ~+/-3%,
     #ltft s/b ~+/-3%,
@@ -187,6 +210,7 @@ class ecuThread(Thread):
     # Set the ready flag so we can boot the GUI.
     if config.gogoGadgetGUI:
       config.ecuReady = True
+
 
   def new_commandsReturn(self, r):
     time.sleep(inECUdelay)
@@ -333,5 +357,41 @@ class ecuThread(Thread):
     global fuelRate
     fuelRate = r.value
 
-
-
+def clearCodes(edo, eas):
+    os.system("echo '>>>>' DO=%i AS=%i >> ../logs/TEMP.DTCDBG.LOG" % ((config.autoclearECU), (config.autoclearSDTC)))
+    global clearECU
+    global cmd
+    global response
+    if dtc:
+      config.currentdtc = ""
+      for codes, desc in dtc:
+        config.currentdtc = str(config.currentdtc) + str(codes)
+        os.system("echo '>>>>>>' GRP=%s ONE=%s >> ../logs/TEMP.DTCDBG.LOG" % ((codes), (config.currentdtc)))
+        config.dtc_iter += 1
+        if config.dtc_iter == len(dtc):
+          config.dtc_iter = 0
+    i = 0
+    while dtc and str(config.currentdtc) == str(config.selectdtc1):
+      os.system("echo  ERRORS - EQUAL GET=%i EXP=%i >> ../logs/TEMP.DTCDBG.LOG" % ((len(config.currentdtc)), (len(config.selectdtc1))))
+      os.system("echo  '                              EQUAL PENDINGS --' GOT=%i EXP=%i >> ../logs/TEMP.DTCDBG.LOG" % ((len(config.currentPending)), (len(config.selectPending1))))
+      #cmd = obd.commands.CLEAR_DTC
+      #response = connection.query(cmd)
+      #connection.watch(obd.commands.CLEAR_DTC, callback=None)
+      #connection.watch(obd.commands.CLEAR_DTC)
+      try:
+        connection.query(obd.commands.CLEAR_DTC)
+      except:
+        os.system("echo 'ecu is NOT defined at _this_ time' >> ../logs/TEMP.DTCDBG.LOG")
+      os.system("echo '!!!!!!' ECU.CON details AS=%s >> ../logs/TEMP.DTCDBG.LOG" % ((dir(connection.watch(connection)))))
+      time.sleep(0.125)
+      i += 1
+      os.system("echo 'welcome to the while loop' >> ../logs/TEMP.DTCDBG.LOG")
+      if i == 10:
+        break
+      ##ktb0000 this is where I get: the global name 'self' is not defined
+      #connection.watch(obd.commands.CLEAR_DTC, callback=self.new_clearDTC)
+    os.system("echo 'EXITED the while loop' >> ../logs/TEMP.DTCDBG.LOG")
+    if i == 10:
+      return False
+    else:
+      return edo

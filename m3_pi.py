@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 import config, ecu, log, time, datetime, sys
 import pygame, time, os, csv
+import obd
 from pygame.locals import *
 
 ##ktb4 if you want to move this to config, maybe add some logic
@@ -89,6 +90,9 @@ if  config.debugFlag:
 
 # Run the game loop
 while True:
+    #ecu.connection.stop
+    #time.sleep(0.375)
+    #ecu.connection.start
     if ecu.dtc:
       config.dtc_error = len(ecu.dtc)
     else:
@@ -166,12 +170,14 @@ while True:
       # Print all the DTCs
       ##debug method
       if ecu.dtc or ecu.pending:
+        config.dtc_iter = 0
         if ecu.pending:
           for codes, desc in ecu.pending:
             drawText(codes, 120, -80 + (config.dtc_iter * 50), "label")
             config.dtc_iter += 1
             if config.dtc_iter == len(ecu.pending):
               config.dtc_iter = 0
+        config.dtc_iter = 0
         if ecu.dtc:
           for codes, desc in ecu.dtc:
             drawText(codes, -120, -80 + (config.dtc_iter * 50), "label")
@@ -194,6 +200,7 @@ while True:
       if ecu.tach_iter < 0:
         print "WARNING - negative RPMs are reserved for dark matter engines"
         if ecu.rpm == -1:
+          #I don't think this line is legal ktb5
           ecu.tach = 50
           ##not audible## os.system('speaker-test -c2 -twav -l3')
           #sound
@@ -375,9 +382,12 @@ while True:
     pygame.display.update()
 
     #ecu.dtc = "P0440"
+    
+    # #os.system("echo '!!!' M3 sees ECU.CON details AS=%s >> ../logs/TEMP.DTCDBG.LOG" % ((dir(ecu.connection))))
     if ecu.dtc or ecu.pending:
       if ecu.pending:
         config.currentPending = ""
+        config.dtc_iter = 0
         for codes, desc in ecu.pending:
           config.currentPending = str(config.currentPending) + str(codes)
           config.dtc_iter += 1
@@ -385,6 +395,7 @@ while True:
             config.dtc_iter = 0
       if ecu.dtc:
         config.currentdtc = ""
+        config.dtc_iter = 0
         for codes, desc in ecu.dtc:
           config.currentdtc = str(config.currentdtc) + str(codes)
           config.dtc_iter += 1
@@ -392,15 +403,40 @@ while True:
             config.dtc_iter = 0
 
       #if config.currentdtc == config.selectdtc1:
-      config.autoclearSDTC = False
+      # # config.autoclearSDTC = False
       #ktb000 can't seem to operate on these
-      if len(config.currentdtc) == len(config.selectdtc1):
-        #ecu.clearECU = True
-       os.system("echo EQUAL Err-GETTINGLen=%i Err-EXPECTLen=%i Pen-GETTINGLen=%i Pen-EXPECTLen=%i >> ../logs/TEMP.DEBUG.LOG" % ((len(str(config.currentdtc))), (len(str(config.selectdtc1))), (len(str(config.currentPending))), (len(str(config.selectPending1) ))
-        config.autoclearSDTC = True
-      else:
-       print "ahm"
-       os.system("echo NOTeq Err-GETTINGLen=%i Err-EXPECTLen=%i Pen-GETTINGLen=%i Pen-EXPECTLen=%i >> ../logs/TEMP.DEBUG.LOG" % ((len(str(config.currentdtc))), (len(str(config.selectdtc1))), (len(str(config.currentPending))), (len(str(config.selectPending1) ))
-       #os.system("echo GETTINGLen=%i EXPECTLen=%i >> ../logs/TEMP.DTCS.LOG" % ((len(config.currentdtc)), (len(config.selectdtc1)))) 
-       #os.system("echo GETTINGLen=%s EXPECTLen=%s >> ../logs/TEMP.DTCS.LOG" % (str(len(config.currentdtc)), (str(len(config.selectdtc1)))) 
+      #if len(config.currentdtc) == len(config.selectdtc1):
+    if config.autoclearSDTC and ecu.dtc:
+      config.dtc_iter = 0
+      if ecu.dtc and str(config.currentdtc) == str(config.selectdtc1):
+        os.system("echo  ERRORS - EQUAL GET=%i EXP=%i >> ../logs/TEMP.DTCDBG.LOG" % ((len(config.currentdtc)), (len(config.selectdtc1))))
+        os.system("echo  '                              EQUAL PENDINGS --' GOT=%i EXP=%i >> ../logs/TEMP.DTCDBG.LOG" % ((len(config.currentPending)), (len(config.selectPending1))))
+
+        ##dear ~god~ globalInterpreter of  python with multiThreading...
+        ##This is the same technique that would be needed to toggle the deepMetrics, I'll pass...
+        ecu.connection.close()
+        time.sleep(11)
+        config.autoclearECU = True
+        config.ecuReady = False
+        ecu.ecuThread()
+        while not config.ecuReady:
+          time.sleep(.03) #is 100fps a goal when GW's POC was 55fps? ktb4 slow the roll?
+
+        time.sleep(11)
+
+        ecu.connection.close()
+        time.sleep(11)
+        config.autoclearECU = False
+        config.ecuReady = False
+        ecu.ecuThread()
+        while not config.ecuReady:
+          time.sleep(.03) #is 100fps a goal when GW's POC was 55fps? ktb4 slow the roll?
+
+        # #os.system("echo 'welcome to the while loop' >> ../logs/TEMP.DTCDBG.LOG")
+        #A code reset should only once per app start pls, to avoid anything nasty from being hidden
+        config.autoclearSDTC = False
+        config.autoclearECU = False #kinda repetitive...
+        ecu.dtc = None
+        os.system("echo 'MAYBE CLEARed CODES' %i >> ../logs/TEMP.DTCDBG.LOG" % (int(config.dtc_iter)))
+        
 
