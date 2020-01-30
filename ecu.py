@@ -107,7 +107,8 @@ class ecuThread(Thread):
       os.stat(config.elmDev)
     except:
       config.elmDev = config.elmAlt
-      inECUdelay = 0.75
+      #The emu is slow anyway, may as well make it stable - Oh... that and BT sucks.  I've implemented stack on pcie. Sux.
+      inECUdelay = 0.75 #elm327 blueooths need about 1 sec, so with the lib delay of 0.25 we're more stable here
   
     # Connect to the ECU.
     try:
