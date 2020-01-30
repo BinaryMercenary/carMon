@@ -4,14 +4,10 @@ import datetime
 import numpy as np
 
 ##ktb0 hot ticket items:
-#auto launcher
-#set bashr rc terminal to 56x14 chars for the 240x480 (in the .sh launcher)
 #ktb3 - road time needed!
-#why does P0440 show up as C0600??? (in 07/pending mode)
-#P0440 show up as C060 ALSO in in 03 mode?
-#ktb4 THEN You can test the auto-clear of SINGLE code
-#ktb 6 - INC status for the gray indicator discs
-#I'm afraid the emulator is not fullfilling it's role 100% here :/
+#ktb 2 - why does P0440 show up as C0600??? (in 07/pending mode)
+#ktb 1 - INC status for the gray indicator discs
+#I'm afraid the emulator is not fullfilling it's role 100% here :/ - looked so promising but too many bugs and speed issues
 
 ##  Globals.
 ## Inits to 0

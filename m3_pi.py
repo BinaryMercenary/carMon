@@ -206,8 +206,9 @@ while True:
           #sound
           os.system('tput bel')
           os.system('echo "(BT) RPM -1 `date +%Y-%m-%d-%H%M.%S`" >> ../logs/ERROR.`date +%Y-%m-%d-%H%M`.BT.LOG')
-          #ktb0.5 there is a gap/bug here still - will get mad print and not back to bt connect (watchdog needed)
-          #ktb8 def add the light show trigger here, not an exit
+          ## ktb0.5 there is a gap/bug here still - will get mad print and not back to bt connect (watchdog needed)
+          #  ...could use similar logic as the big bad DTC squasher
+          ## ktb8 def add the light show trigger here, not an exit
           ##and some https://www.pygame.org/docs/ref/mixer.html
           #sys.exit()
           #-1 is a "magice number for exit, other negative are for below "light show"
@@ -259,7 +260,6 @@ while True:
           logLength = len(list)
         #Debug gui display refresh 10 times a second.
         if config.gui_test_time > config.dbg_rate:
-          #attn ktb0 - there is a logLength issue here after click event
           print config.debugFlag
           print logLength
           try:
@@ -401,10 +401,6 @@ while True:
           if config.dtc_iter == len(ecu.dtc):
             config.dtc_iter = 0
 
-      #if config.currentdtc == config.selectdtc1:
-      # # config.autoclearSDTC = False
-      #ktb000 can't seem to operate on these
-      #if len(config.currentdtc) == len(config.selectdtc1):
     ## The big bad matched DTC squasher - shutup charcoal cannister!
     if config.autoclearSDTC and ecu.dtc:
       config.dtc_iter = 0
