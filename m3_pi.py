@@ -90,9 +90,7 @@ if  config.debugFlag:
 
 # Run the game loop
 while True:
-    #ecu.connection.stop
-    #time.sleep(0.375)
-    #ecu.connection.start
+    #I should consider addding a re-connect using some of the logic from the big bad DTC squasher - ktb5
     if ecu.dtc:
       config.dtc_error = len(ecu.dtc)
     else:
@@ -147,6 +145,8 @@ while True:
         ## let's do something on double tap
         #https://www.pygame.org/wiki/toggle_fullscreen?parent=CookBook pygame.display.toggle fullscreen ? Nah.
         #Toggle to deeper metrics will suffice for now
+        #This does NOT reduce read-load on the ECU conn. ktb9 Find a better use for the double tap?
+        #ktb3 maybe I should do an image as a third screen? since that would be unavailable when dtcs exist
         config.deepMetrics = not config.deepMetrics
       config.tapTimer = 0
       config.tapCount = 0
@@ -383,7 +383,6 @@ while True:
 
     #ecu.dtc = "P0440"
     
-    # #os.system("echo '!!!' M3 sees ECU.CON details AS=%s >> ../logs/TEMP.DTCDBG.LOG" % ((dir(ecu.connection))))
     if ecu.dtc or ecu.pending:
       if ecu.pending:
         config.currentPending = ""
@@ -406,37 +405,42 @@ while True:
       # # config.autoclearSDTC = False
       #ktb000 can't seem to operate on these
       #if len(config.currentdtc) == len(config.selectdtc1):
+    ## The big bad matched DTC squasher - shutup charcoal cannister!
     if config.autoclearSDTC and ecu.dtc:
       config.dtc_iter = 0
       if ecu.dtc and str(config.currentdtc) == str(config.selectdtc1):
-        os.system("echo  ERRORS - EQUAL GET=%i EXP=%i >> ../logs/TEMP.DTCDBG.LOG" % ((len(config.currentdtc)), (len(config.selectdtc1))))
-        os.system("echo  '                              EQUAL PENDINGS --' GOT=%i EXP=%i >> ../logs/TEMP.DTCDBG.LOG" % ((len(config.currentPending)), (len(config.selectPending1))))
+        #whoops asterisk is literal here and ls'd all the pwd -- lafs
+        #os.system("echo  ERRORS   GOT=%i EXP=%i ***** >> ../logs/TEMP.DTCDBG.LOG" % ((len(config.currentdtc)), (len(config.selectdtc1))))
+        os.system("echo  ERRORS   GOT=%i EXP=%i '*****' >> ../logs/TEMP.DTCDBG.LOG" % ((len(config.currentdtc)), (len(config.selectdtc1))))
+        os.system("echo  pending  got=%i exp=%i >> ../logs/TEMP.DTCDBG.LOG" % ((len(config.currentPending)), (len(config.selectPending1))))
 
         ##dear ~god~ globalInterpreter of  python with multiThreading...
         ##This is the same technique that would be needed to toggle the deepMetrics, I'll pass...
         ecu.connection.close()
-        time.sleep(11)
+        time.sleep(11)  #I tried to lower this to even 9 sec, locks up. ktb3 proly use connection( .close .is_connected .running  .status)
         config.autoclearECU = True
         config.ecuReady = False
         ecu.ecuThread()
         while not config.ecuReady:
           time.sleep(.03) #is 100fps a goal when GW's POC was 55fps? ktb4 slow the roll?
 
-        time.sleep(11)
+        #might need a while loop here for RPM pls ktb2 - it's about 10 seconds on the ecu sim so.. for now
+        time.sleep(11) #OR carefull tweak/ehnance this with ktb3 proly use connection( .is_connected .running  .status)
 
+        ## probably no need for unwatch_all
         ecu.connection.close()
-        time.sleep(11)
+        time.sleep(11)  #I tried to lower this to even 9 sec, locks up. ktb3 proly use connection( .close .is_connected .running  .status)
         config.autoclearECU = False
         config.ecuReady = False
         ecu.ecuThread()
         while not config.ecuReady:
           time.sleep(.03) #is 100fps a goal when GW's POC was 55fps? ktb4 slow the roll?
 
-        # #os.system("echo 'welcome to the while loop' >> ../logs/TEMP.DTCDBG.LOG")
         #A code reset should only once per app start pls, to avoid anything nasty from being hidden
         config.autoclearSDTC = False
         config.autoclearECU = False #kinda repetitive...
         ecu.dtc = None
-        os.system("echo 'MAYBE CLEARed CODES' %i >> ../logs/TEMP.DTCDBG.LOG" % (int(config.dtc_iter)))
+        #ktb4 DTCDBG entries would ideally appear in the csv as part of the disposition string or AT LEAST be dated...
+        os.system("echo 'carMon has cleared matched DTC Code(s)' >> ../logs/TEMP.DTCDBG.LOG" )
         
 

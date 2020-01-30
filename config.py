@@ -88,7 +88,6 @@ printCommands = True
 #uses 04: Clear DTCs and Freeze data
 autoclearSDTC = True
 autoclearECU = False
-# #autoclearECU = True
 
 #clear the matched selectdtc1 regardless of how pending(s)
 ignorePending = True
@@ -117,8 +116,8 @@ dtc_inc = 0 #use 0600: Supported MIDs [01-20]
 
 ##These should probably be lists, not strings BUT really, how many codes do you want to ignore?
 ##You can ignore more than one if you know the order they present it, or feel free to do some code
-selectdtc1 = "U0101B0102C0032"
-# #selectdtc1 = "P0440"
+selectdtc1 = "P0440"
+# #selectdtc1 = "U0101B0102C0032" #debug on ecu for matching
 #ktb0 I need to sub this C0600 for P0440 - all other tools show P0440 but something in this setup is getting a C0600
 substituteCodeFrom = "C0600"
 substituteCodeTo = "P0440"
