@@ -69,6 +69,7 @@ settingsFlag = False
 
 ## Inits to True (when fullscreen is used)
 fullscreen = True
+fullscreen = False # #
 ##gogoGadgetGUI = False
 gogoGadgetGUI = True
 #ktb unc# gogoGadgetGUI = True
@@ -135,6 +136,7 @@ RESOLUTION = (480, 320)
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
 ORANGE = (255,112,00)
+LIME = (102,255,00)
 CHARCOAL = (54,69,79)
 
 ##M3 specific, tbd

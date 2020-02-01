@@ -7,7 +7,8 @@ from pygame.locals import *
 
 ##ktb4 if you want to move this to config, maybe add some logic
 #where RPMP 0 means never use RPMP, else do use RPMP
-RPMP = 0;
+RPMP = 0
+peakMAF = 0
 
 #this is part of the repo and there for NOT in config
 imgdir = "/home/pi/carMon/images/"
@@ -142,12 +143,18 @@ while True:
 
     if config.tapTimer > config.tapTimerWindow:
       if config.tapCount == 2:
+        #Double tap will clear aby peak values
+        peakMAF = 0
         ## let's do something on double tap
+     #ktb0 - peak value for MAF pls!!!
+      #Double tap to clear lock values!!!
+       #ktb1 log values at time of double tap to highlights (freeze the whole peak value as an array, too...)
+        #ktb1 - peak value -- at double tap, certain values like MAF (only maf?) lock at peak value?
         #https://www.pygame.org/wiki/toggle_fullscreen?parent=CookBook pygame.display.toggle fullscreen ? Nah.
         #Toggle to deeper metrics will suffice for now
         #This does NOT reduce read-load on the ECU conn. ktb9 Find a better use for the double tap?
         #ktb3 maybe I should do an image as a third screen? since that would be unavailable when dtcs exist
-        config.deepMetrics = not config.deepMetrics
+        # no point # config.deepMetrics = not config.deepMetrics
       config.tapTimer = 0
       config.tapCount = 0
 
@@ -245,6 +252,21 @@ while True:
       drawText(str(ecu.MAF) + "", -150, -145, "readout") #no g/s label, gps is fine
       drawText("MAF", -190, -110, "label")
 
+      if float(str(ecu.MAF).replace(' gps','')) > float(str(peakMAF).replace(' gps','')):
+        peakMAF = ecu.MAF
+
+      # Draw the session peak MAF readout:
+      #drawText(str(peakMAF) + "", -190, -75, "readout") #no g/s label, gps is fine
+      ##ktb4 modify font to use COLOR (when absent, default to white) - have colors with NOT? and timers for flash?
+      #string = str(peakMAF) + " gps"
+      string = str(peakMAF).replace(' gps','')
+      text = readoutFont.render(string, True, config.LIME)
+      textRect = text.get_rect()
+      textRect.centerx = windowSurface.get_rect().centerx + -170
+      textRect.centery = windowSurface.get_rect().centery + -75
+      windowSurface.blit(text, textRect)
+
+
       # Draw the engine load readout and label.
       drawText(str(ecu.engineLoad) + " %", 0, -145, "readout")
       drawText("Load", 0, -110, "label")
@@ -322,7 +344,7 @@ while True:
 
     # Do logs per the specified asynch interval
     if config.time_elapsed_since_last_action > config.log_rate and config.logMetrics:
-      os.system("echo ERROR=%s PENDING=%s INCOMPLETE=%s >> ../logs/TEMP.DTCS.LOG" % (config.currentdtc, config.currentPending, config.currentIncomplete))
+      #ktb2 inc dbg# os.system("echo ERROR=%s PENDING=%s INCOMPLETE=%s >> ../logs/TEMP.DTCS.LOG" % (config.currentdtc, config.currentPending, config.currentIncomplete))
       #Log all of our Data.
       ##ktb4 I still need to do something with config.disposition for output AND proper population
       config.disposition += config.buildInfo
@@ -348,14 +370,15 @@ while True:
       #If I don't want this to flash I can move it back to the space between Cooland and Intake
       ##The logic here should be the opposite of the default mode, ktb3 tbd if I want 15 pids or 10.  *10 was fast on car vs emu.*
       config.buildInfo = ""
-      if not config.deepMetrics:
-        string = str(len(data)) + " PIDs"
-        text = readoutFont.render(string, True, config.ORANGE)
-        textRect = text.get_rect()
-      # flashes here
-        textRect.centerx = windowSurface.get_rect().centerx + 0
-        textRect.centery = windowSurface.get_rect().centery + 140
-        windowSurface.blit(text, textRect)
+## Not keen on deleting this yet as it might come back to me at a later time ktb9qqq
+#      if not config.deepMetrics:
+#        string = str(len(data)) + " PIDs"
+#        text = readoutFont.render(string, True, config.ORANGE)
+#        textRect = text.get_rect()
+#      # flashes here
+#        textRect.centerx = windowSurface.get_rect().centerx + 0
+#        textRect.centery = windowSurface.get_rect().centery + 140
+#        windowSurface.blit(text, textRect)
 
       ##Log speed events based on the below thresholds
       if not config.debugFlag:

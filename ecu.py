@@ -7,7 +7,6 @@ import numpy as np
 # Globals
 clearDTC = "DTC not cleared"
 commandsReturn = "Return a list of all commands"
-clearECU = False
 #incompleteMon = None
 pending = None
 rpm = 0
@@ -38,14 +37,11 @@ stft1 = -1
 stft2 = -1
 cmd = ""
 response = ""
-edo = False
-eas = False
 ## this value may belong in config
 ## it is a delay meant to reduce over polling of the ecu
 ## since we only see sparse updates every 1.25 seconds (avg 2.125s bulk)
 ## ktb1 testing if this will improve bluetooth stability - tho errors just need more handling
 inECUdelay = 0.001
-
 
 # Function to figure out what tach image we should display based on the RPM.
 def getTach():
@@ -103,12 +99,13 @@ class ecuThread(Thread):
     obd.logger.setLevel(obd.logging.DEBUG)
 
     # (weakly) Validate elmDevice has been attached to kernel
+    #usb fail lately, BUT this is not is ktb-1
     try:
       os.stat(config.elmDev)
     except:
       config.elmDev = config.elmAlt
       #The emu is slow anyway, may as well make it stable - Oh... that and BT sucks.  I've implemented stack on pcie. Sux.
-      inECUdelay = 0.75 #elm327 blueooths need about 1 sec, so with the lib delay of 0.25 we're more stable here
+      inECUdelay = 0.75 #elm327 bluetooths need about 1 sec, so with the lib delay of 0.25 we're more stable here
   
     # Connect to the ECU.
     try:
@@ -270,13 +267,13 @@ class ecuThread(Thread):
       engineLoad = 0
 
   def new_pending(self, r):
-    time.sleep(inECUdelay)
+#    time.sleep(inECUdelay)
     global pending
     pending = r.value
 
   def new_dtc(self, r):
+#    time.sleep(inECUdelay)
     global dtc
-    time.sleep(inECUdelay)
     dtc = r.value
 
   def new_fuel_inject_timing(self, r):
