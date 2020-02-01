@@ -69,7 +69,6 @@ settingsFlag = False
 
 ## Inits to True (when fullscreen is used)
 fullscreen = True
-fullscreen = False # #
 ##gogoGadgetGUI = False
 gogoGadgetGUI = True
 #ktb unc# gogoGadgetGUI = True
