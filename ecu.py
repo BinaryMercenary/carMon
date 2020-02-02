@@ -7,8 +7,10 @@ import numpy as np
 # Globals
 clearDTC = "DTC not cleared"
 commandsReturn = "Return a list of all commands"
-#incompleteMon = None
+connection = None
+dtc = None
 pending = None
+#incompleteMon = None
 rpm = 0
 speed = 0
 coolantTemp = 0
@@ -19,8 +21,6 @@ timingAdvance = 0
 engineLoad = 0
 tach_iter = 0
 gear = 0
-connection = None
-dtc = None
 rpm_gauge = 0
 fit = -1
 frpd = -1
@@ -89,7 +89,7 @@ class ecuThread(Thread):
     self.start()
 
   def run(self):
-    #time.sleep(inECUdelay)#
+    #time.sleep(inECUdelay)# Adding a delay here may (also) be detrimental
     #ktb2 maybe add a try here to handle the crashes?
     global connection
     ports = obd.scan_serial()
@@ -141,7 +141,7 @@ class ecuThread(Thread):
     #ktb3 add a less frequent level to these get error and pending and get inc
     connection.watch(obd.commands[0x03][0], callback=self.new_dtc)
     connection.watch(obd.commands[0x07][0], callback=self.new_pending)
-    #ktb2 inc values please! # connection.watch(obd.commands[0x0qqq][0], callback=self.new_pending)
+    #ktb2 inc values please! # connection.watch(obd.commands[0x0qqq][0], callback=self.new_incs)
 
     if config.autoclearECU:
       connection.watch(obd.commands.CLEAR_DTC, callback=self.new_clearDTC)
@@ -267,13 +267,19 @@ class ecuThread(Thread):
       engineLoad = 0
 
   def new_pending(self, r):
-#    time.sleep(inECUdelay)
+    #time.sleep(inECUdelay) ## WARNING adding a delay here CRASHED serials comms after first read (But not BT)
     global pending
     pending = r.value
 
   def new_dtc(self, r):
-#    time.sleep(inECUdelay)
+    #time.sleep(inECUdelay) ## WARNING adding a delay here CRASHED serials comms after first read (But not BT)
     global dtc
+    dtc = r.value
+
+  ## this sonnet will return a list of monitor states. ktb1
+  def new_incs(self, r):
+    #time.sleep(inECUdelay) ## WARNING adding a delay here (might also) CRASH serials comms after first read
+    global incompleteMon
     dtc = r.value
 
   def new_fuel_inject_timing(self, r):

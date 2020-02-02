@@ -25,7 +25,6 @@ logIter = 1
 ## Inits to other
 ## This doesn't have to be 50, as there are only 0-42 graduations,
 ## but higher value will have flash effect, especially with a padded rpm value
-carrier = 21 #ktb test value - cleanup qqq
 rpm_grads = 50
 tapTimerWindow = 900
 
@@ -71,7 +70,6 @@ settingsFlag = False
 fullscreen = True
 ##gogoGadgetGUI = False
 gogoGadgetGUI = True
-#ktb unc# gogoGadgetGUI = True
 
 logMetrics = True
 

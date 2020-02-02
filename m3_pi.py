@@ -229,11 +229,11 @@ while True:
       # ktb1 pls add logic to draw a EMU MODE WARNING label when config.redline_emu !=1
 
       # Draw the coolant temp readout and label.
-      drawText(str(ecu.coolantTemp) + "\xb0", -160, 105, "readout") #"\xb0C" adding work - Need config.ktb C/F (hack - grab left 3 in to.string qqq??)
+      drawText(str(ecu.coolantTemp) + "\xb0", -160, 105, "readout") #"\xb0C" adding work - Need config.ktb1 -- use string replace pls
       drawText("Coolant", -170, 140, "label")
 
       # Draw the intake temp readout and label.i
-      drawText(str(ecu.intakeTemp) + "", 190, 105, "readout") #"\xb0C" not want - Need ecu.ktb3 routine for abs<>magn pass/set "-" or sth
+      drawText(str(ecu.intakeTemp) + "", 190, 105, "readout") #"\xb0C" not want - Need ecu.ktb3 ktb1 -- use string replace pls 
       drawText("Intake", 190, 140, "label")
 
       # Draw the gear readout and label.
@@ -314,8 +314,6 @@ while True:
           ecu.engineLoad =  config.metrics[7]
           ecu.timingAdvance = config.metrics[8]
           ecu.transmissionTemp = config.metrics[9]
-          ##ktb keep an eye on this during testing
-          #ecu.dtc = None
           ecu.calcGear(ecu.rpm, ecu.speed)
           ecu.getTach()
           print "< Tracking realtime variance during debug:"
