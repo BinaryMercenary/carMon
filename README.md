@@ -1,7 +1,6 @@
 # carMon
+
   ATTN - runs fullscreen by default - triple click or triple tap to exit the app (or click/tap *many* times if high load...).
-  Double tap for latest feature (as of 2/2/02, reset MAF peak read)
-  Single tap to iterate through screens
 
   Fork of Geoffrey Wacker's (GW) Cal Poly SLO project, initially for M3 but will be adapting to IS300 and making more generic/portable as time permits.
 (See https://digitalcommons.calpoly.edu/cpesp/235)
@@ -20,3 +19,5 @@
   I've tested against an ecu emulator and in-car with both my ScanTool OBDLink SX 425801 cable and a cheap (but safe) elm327 Bluetooth.  On a side note, some issue (library or maybe a defective cable register?) has shomehow caused a pending P0440 code to mis-read as a C0XXX code - I verified with several other scanners for sanity and will see of the bluetooth elm327 finds the same mismatch before messing with carMon code on the matter.
   
   Anyway, thanks _internet_, github, python-ODB, and thanks especially GW for the great starting point.  Please feel free to download/distribute this project, with no warranties for intended use of any kind.  This code is free per GNU/GPL/Digital commons and unsupported.
+  
+  Voila, içi! ![2001 is300 wearing Carmon]https://github.com/BinaryMercenary/carMon/blob/master/images/art/SampleInstall.jpg
