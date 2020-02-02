@@ -110,6 +110,7 @@ dtc_inc = 0 #use 0600: Supported MIDs [01-20]
 
 ##These should probably be lists, not strings BUT really, how many codes do you want to ignore?
 ##You can ignore more than one if you know the order they present it, or feel free to do some code
+#for single code matching we could do a 4-char string P044 matcher for any single P044X catch-all ktb88 
 selectdtc1 = "P0440"
 # #selectdtc1 = "U0101B0102C0032" #debug on ecu for matching
 #ktb0 I need to sub this C0600 for P0440 - all other tools show P0440 but something in this setup is getting a C0600
@@ -135,6 +136,16 @@ WHITE = (255, 255, 255)
 ORANGE = (255,112,00)
 LIME = (102,255,00)
 CHARCOAL = (54,69,79)
+
+## the IS300 is a prettty close match to GW's m3 lut here, with this gearing and rear-diff spec:
+#  1st 3.357	2nd 2.180	3rd 1.424	4th 1.000	5th 0.753	R3.431	3.91 final (2001, AT)*
+#  1st 3.566	2nd 2.056	3rd 1.384	4th 1.000	5th 0.85	R4.091	3.73 final (2001, MT)*
+#  1st 4.20	2nd 2.49	3rd 1.66	4th 1.24	5th 1.0 	RX.YYY	3.23 final 1997 BMW M3ii**
+#    
+#  it might be worth making an LUT generator function, if any of this gearing info is worth keeping around
+#  *ESPECIALLY since tire diamater is dynamic and needs figured in
+#  **336.13 (in/sec*pi for GW's EU dogleg)
+#  on that regard, having a large red flashing slip-indicator would be great for people with AT's. ktb999
 
 ##M3 specific, tbd
 # LUT representing the speeds at each of the five gears. Each entry is +200 RPM, and is directly linked to rpmList.
