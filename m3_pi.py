@@ -27,6 +27,12 @@ def drawText(string, x, y, font):
   textRect.centery = windowSurface.get_rect().centery + y
   windowSurface.blit(text, textRect)
 
+## Let's add a basic handler here:
+## 1) show the ip of the pi on second screen for ppl who don't wanna run `arp-scan -l | grep -v "b8:27"` or ifconfig commands ktb3
+## or
+## 2) a tie to bash script that does fallsback to ad-hoc ~wifi ap mode to allow in-car tablet tail of logs with ssh/piHelper  ktb99
+##  the caveats here are a) the wifi will likely be connected at car start (pi's startup delay race condition aside)
+##                       b) this server will interfere with ./optional/scpFiles.sh being able to connect... :| 
 # Connect to the ECU.
 if not config.debugFlag:
     try:
@@ -158,6 +164,11 @@ while True:
       config.tapTimer = 0
       config.tapCount = 0
 
+    ## in or probably before this loop (for ease of testing)
+    ## let's add a single-session script that runs a bash scp job ktb9
+    ## to push all the files to designated server ONLY when rpms == 0 (tho probably AFTER a run, and not before?)
+    ## if .. ~conditions:
+    ##   os.system("./optional/scpFiles.sh") 
     if not config.debugFlag:
       #Figure out what tach image should be.
       ecu.getTach()
