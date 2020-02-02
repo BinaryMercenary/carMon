@@ -7,7 +7,10 @@ import numpy as np
 # Globals
 clearDTC = "DTC not cleared"
 commandsReturn = "Return a list of all commands"
-pending = "P9999"
+connection = None
+dtc = None
+pending = None
+#incompleteMon = None
 rpm = 0
 speed = 0
 coolantTemp = 0
@@ -18,8 +21,6 @@ timingAdvance = 0
 engineLoad = 0
 tach_iter = 0
 gear = 0
-connection = None
-dtc = None
 rpm_gauge = 0
 fit = -1
 frpd = -1
@@ -34,6 +35,8 @@ o2Stftb1 = -1
 o2Stftb2 = -1
 stft1 = -1
 stft2 = -1
+cmd = ""
+response = ""
 ## this value may belong in config
 ## it is a delay meant to reduce over polling of the ecu
 ## since we only see sparse updates every 1.25 seconds (avg 2.125s bulk)
@@ -81,11 +84,13 @@ def calcGear(rpm, speed):
 class ecuThread(Thread):
   def __init__(self):
     Thread.__init__(self)
+    #ktb2 maybe add a try here to handle the crashes?
     self.daemon = True
     self.start()
 
   def run(self):
-    #time.sleep(inECUdelay)#
+    #time.sleep(inECUdelay)# Adding a delay here may (also) be detrimental
+    #ktb2 maybe add a try here to handle the crashes?
     global connection
     ports = obd.scan_serial()
     print ports
@@ -94,10 +99,13 @@ class ecuThread(Thread):
     obd.logger.setLevel(obd.logging.DEBUG)
 
     # (weakly) Validate elmDevice has been attached to kernel
+    #usb fail lately, BUT this is not is ktb-1
     try:
       os.stat(config.elmDev)
     except:
       config.elmDev = config.elmAlt
+      #The emu is slow anyway, may as well make it stable - Oh... that and BT sucks.  I've implemented stack on pcie. Sux.
+      inECUdelay = 0.75 #elm327 bluetooths need about 1 sec, so with the lib delay of 0.25 we're more stable here
   
     # Connect to the ECU.
     try:
@@ -128,8 +136,19 @@ class ecuThread(Thread):
     connection.watch(obd.commands.ENGINE_LOAD, callback=self.new_engine_load)
     connection.watch(obd.commands[0x01][0x05], callback=self.new_coolant_temp)
     #connection.watch(obd.commands.COOLANT_TEMP, callback=self.new_coolant_temp)
+    #this is an expensive call but is needed for my warning icons
     #connection.watch(obd.commands.GET_DTC, callback=self.new_dtc)
+    #ktb3 add a less frequent level to these get error and pending and get inc
+    connection.watch(obd.commands[0x03][0], callback=self.new_dtc)
+    connection.watch(obd.commands[0x07][0], callback=self.new_pending)
+    #ktb2 inc values please! # connection.watch(obd.commands[0x0qqq][0], callback=self.new_incs)
 
+    if config.autoclearECU:
+      connection.watch(obd.commands.CLEAR_DTC, callback=self.new_clearDTC)
+
+    ## Hey Kids! Python classes load vars like deepMetrics here ONCE during init
+    ## So, toggling config.deepMetrics later will not change ANYTHING... :| Beware.
+    ## the big bad DTC squasher is one way to bring this about
     if config.deepMetrics:
       connection.watch(obd.commands.TIMING_ADVANCE, callback=self.new_timing_advance)
       ##no support on 2001 is300+elm327## connection.watch(obd.commands.FUEL_INJECT_TIMING, callback=self.new_fuel_inject_timing)
@@ -162,27 +181,11 @@ class ecuThread(Thread):
 
 
     ##Thanks again Danny @ Ratchets And Wrenches - u rock https://youtu.be/pIJdCZgEiys
-    #short term fuel trim percent will increase of your o2 sensor goes low (lean)
+    #short term fuel trim percent will increase if your o2 sensor goes low (lean)
     #long term fuel trim percent will increase gradually as short term fuel trim percent trends
     #stft s/b ~+/-3%,
     #ltft s/b ~+/-3%,
     #sum of ltft + stft sb under ~+/-10%
-
-
-    ## ktb2 - would it be safer to clear this at idle/acc mode (only)???
-    #config.autoclearSDTC = True
-    #config.currentdtc = [""]
-    #config.selectdtc  = [""]
-    if config.autoclearSDTC and (config.currentdtc  == config.selectdtc):
-      time.sleep(inECUdelay)
-      config.disposition = "ATTN: DTC cleared"
-      print "log these resets, pls - ktb2 - >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
-      print clearDTC
-      print " ^^^^ un-init value"
-      connection.watch(obd.commands.CLEAR_DTC, callback=self.new_clearDTC)
-      print " vvvv populated value"
-      print clearDTC
-      print "log these resets, pls - ktb2 - <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"
 
 
     # Start the connection.
@@ -192,19 +195,13 @@ class ecuThread(Thread):
     if config.gogoGadgetGUI:
       config.ecuReady = True
 
+
   def new_commandsReturn(self, r):
     time.sleep(inECUdelay)
     global commandsReturn
     commandsReturn = r
     print "ktb2 tbd output type/format FOR GET~ALL - >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
     print commandsReturn
-
-  def new_pending(self, r):
-    time.sleep(inECUdelay)
-    global pending
-    pending = r
-    print "ktb2 tbd output type/format FOR PENDING - >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
-    print pending
 
   def new_clearDTC(self, r):
     time.sleep(inECUdelay)
@@ -269,8 +266,20 @@ class ecuThread(Thread):
     except:
       engineLoad = 0
 
+  def new_pending(self, r):
+    #time.sleep(inECUdelay) ## WARNING adding a delay here CRASHED serials comms after first read (But not BT)
+    global pending
+    pending = r.value
+
   def new_dtc(self, r):
+    #time.sleep(inECUdelay) ## WARNING adding a delay here CRASHED serials comms after first read (But not BT)
     global dtc
+    dtc = r.value
+
+  ## this sonnet will return a list of monitor states. ktb1
+  def new_incs(self, r):
+    #time.sleep(inECUdelay) ## WARNING adding a delay here (might also) CRASH serials comms after first read
+    global incompleteMon
     dtc = r.value
 
   def new_fuel_inject_timing(self, r):
@@ -337,6 +346,4 @@ class ecuThread(Thread):
     time.sleep(inECUdelay)
     global fuelRate
     fuelRate = r.value
-
-
 

@@ -65,3 +65,13 @@ done' > /etc/switch.sh
 sudo chmod 777 /etc/switch.sh
 sudo sed -i '/etc\/switch.sh &/d' /etc/rc.local
 sudo sed -i '$ i /etc/switch.sh &' /etc/rc.local
+
+
+
+
+##ktb9 275 seconds on return from asia 101 my system was not on
+#did it have a power event and reset? did it 
+#from 
+#20200126205303
+#20200126205406
+#is 103 seconds...
