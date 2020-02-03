@@ -5,6 +5,9 @@
   Single tap to cycles screens (including details of view ECU codes read.)
   Touch and hold - tbd
 
+![](images/art/SampleInstallThumb.jpg)
+
+
   Fork of Geoffrey Wacker's (GW) Cal Poly SLO project, initially for M3 but will be adapting to IS300 and making more generic/portable as time permits.
 (See https://digitalcommons.calpoly.edu/cpesp/235)
 
