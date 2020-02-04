@@ -1,9 +1,9 @@
 # carMon
 
   ATTN - runs fullscreen by default - triple click or triple tap to exit the app (or click/tap *many* times if high load...).
-  Double tap to for special actions (resets peakMAF as of 2/2/02)i
-  Single tap to cycles screens (including details of view ECU codes read.)
-  Touch and hold - tbd
+<li>  Double tap to for special actions (resets peakMAF as of 2/2/02)
+<li>  Single tap to cycles screens (including details of view ECU codes read.)
+<li>  Touch and hold - tbd
 
 ![](images/art/SampleInstallThumb.jpg)
 
@@ -24,7 +24,7 @@
 
   I've tested against an ecu emulator and in-car with both my ScanTool OBDLink SX 425801 cable and a cheap (but safe) elm327 Bluetooth.  On a side note, some issue (library or maybe a defective cable register?) has shomehow caused a pending P0440 code to mis-read as a C0XXX code - I verified with several other scanners for sanity and will see of the bluetooth elm327 finds the same mismatch before messing with carMon code on the matter.
   
-  Anyway, thanks _internet_, github, python-ODB, and thanks especially GW for the great starting point.  Please feel free to download/distribute this project, with no warranties for intended use of any kind.  This code is free per GNU/GPL/Digital commons and unsupported.  For those wanting to shortcut the learning experience, I can mail a disk-dumped pi 3B+ ready raspbian OS on sd card with this code and it's ~frozen dep's pre-installed, leaving your to only worry about hardware integration, $20USD paypal or any ebay/amazon gift card.
+  Anyway, thanks _internet_, github, python-ODB, and thanks especially GW for the great starting point.  Please feel free to download/distribute this project, with no warranties for intended use of any kind.  This code is free per GNU/GPL/Digital commons and unsupported.  For those wanting to shortcut the learning experience, I can mail a disk-dumped pi 3B+ ready raspbian OS on sd card with this code and its ~frozen dep's pre-installed, leaving your to only worry about hardware integration, $20USD paypal or any ebay/amazon gift card.
 
   For those aware of my isfootsi hyperAT https://dynotag.com/1020-9115 installed in https://dynotag.com/1020-9116, that source code remains copyright of my LLC. (sorry, too much work went into designing a safe but performant algo for that).
   
