@@ -1,8 +1,8 @@
 # carMon
 
   ATTN - runs fullscreen by default - triple click or triple tap to exit the app (or click/tap *many* times if high load...).
-<li>  Double tap to for special actions (resets peakMAF as of 2/2/02)
-<li>  Single tap to cycles screens (including details of view ECU codes read.)
+<li>  Double tap for special actions (resets peakMAF as of 2/2/02)
+<li>  Single tap cycles screens (including details of view ECU codes read.)
 <li>  Touch and hold - tbd
 
 ![](images/art/SampleInstallThumb.jpg)
@@ -20,7 +20,7 @@
 
 
 
-  After hacking the web-posted code into a working state (cursed html characters, indentation, missing part of log.py, etc.), I tested with the trusty Mini-Vci/M-vci interface cable (Toyota J2354).  The M-VCI cable is not an ELM327 device, afterall, and will not work as-is (if specs/python class can be made to work at all?).  Pity, as I noticed when using the M-VCI cable with TIS Techstream Diagnostic Cable Toyota Firmware V1.4.1, there are many desirable PIDs not seen on my other scanners (or more likely, a deeper scanning library as seen in ./library/tbd_powertrain.api).  One important value is the ATF temperature.  I've installed an analogue gauge but want to make a thermostat routine in this carMon code to watch ATF fluid temperature and run a fan-tapped relay at a LUT'd duty cycle.
+  After hacking the web-posted code into a working state (cursed html characters, indentation, missing part of log.py, etc.), I tested with the trusty Mini-Vci/M-vci interface cable (Toyota J2354).  The M-VCI cable is not an ELM327 device, afterall, and will not work as-is (if specs/python class can be made to work at all?).  Pity, as I noticed when using the M-VCI cable with TIS Techstream Diagnostic Cable Toyota Firmware V1.4.1, there are many desirable PIDs not seen on my other scanners (or more likely, a deeper scanning library as seen in ./library/tbd_powertrain.api).  One important value is the ATF temperature.  I've installed a dedicated physical analogue gauge but want to make a thermostat routine in this carMon code to watch ATF fluid temperature and run a fan-tapped relay at a LUT'd duty cycle.
 
   I've tested against an ecu emulator and in-car with both my ScanTool OBDLink SX 425801 cable and a cheap (but safe) elm327 Bluetooth.  On a side note, some issue (library or maybe a defective cable register?) has shomehow caused a pending P0440 code to mis-read as a C0XXX code - I verified with several other scanners for sanity and will see of the bluetooth elm327 finds the same mismatch before messing with carMon code on the matter.
   
