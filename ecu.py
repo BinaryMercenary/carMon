@@ -143,7 +143,7 @@ class ecuThread(Thread):
     connection.watch(obd.commands[0x07][0], callback=self.new_pending)
     ## ktb5 the obd library only reads mode06 in CAN protocols...
     ## maybe try this angle https://github.com/lukevp/Python-OBD-Scanner/blob/master/pyobd2-0.4/obd/message/sid01.py
-    connection.watch(obd.commands[0x01][0x01], callback=self.new_incs)
+    #connection.watch(obd.commands[0x01][0x01], callback=self.new_incs)
 
     if config.autoclearECU:
       connection.watch(obd.commands.CLEAR_DTC, callback=self.new_clearDTC)
