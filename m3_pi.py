@@ -36,6 +36,7 @@ def drawText(string, x, y, font):
 # Connect to the ECU.
 if not config.debugFlag:
     try:
+      # #obd.logger.setLevel(obd.logging.DEBUG)
       launchy = ecu.ecuThread()
     except:
       #shoot, this doesn't work -- you need some kind of watchdog or sth tricky ktb5
@@ -432,6 +433,8 @@ while True:
           config.dtc_iter += 1
           if config.dtc_iter == len(ecu.dtc):
             config.dtc_iter = 0
+
+    #if ecu.incs: ...
 
     ## The big bad matched DTC squasher - shutup charcoal cannister!
     if config.autoclearSDTC and ecu.dtc:

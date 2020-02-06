@@ -141,7 +141,9 @@ class ecuThread(Thread):
     #ktb3 add a less frequent level to these get error and pending and get inc
     connection.watch(obd.commands[0x03][0], callback=self.new_dtc)
     connection.watch(obd.commands[0x07][0], callback=self.new_pending)
-    #ktb2 inc values please! # connection.watch(obd.commands[0x0qqq][0], callback=self.new_incs)
+    ## ktb5 the obd library only reads mode06 in CAN protocols...
+    ## maybe try this angle https://github.com/lukevp/Python-OBD-Scanner/blob/master/pyobd2-0.4/obd/message/sid01.py
+    connection.watch(obd.commands[0x01][0x01], callback=self.new_incs)
 
     if config.autoclearECU:
       connection.watch(obd.commands.CLEAR_DTC, callback=self.new_clearDTC)
@@ -280,7 +282,7 @@ class ecuThread(Thread):
   def new_incs(self, r):
     #time.sleep(inECUdelay) ## WARNING adding a delay here (might also) CRASH serials comms after first read
     global incompleteMon
-    dtc = r.value
+    incompleteMon = r.value
 
   def new_fuel_inject_timing(self, r):
     time.sleep(inECUdelay)
