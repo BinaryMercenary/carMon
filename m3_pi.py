@@ -182,8 +182,6 @@ while True:
     # Load your logo
     windowSurface.blit(img, (windowSurface.get_rect().centerx - 105, windowSurface.get_rect().centery + 60))
     # If the settings button has been pressed:
-    cmdStatus, config.piTemp = commands.getstatusoutput("vcgencmd measure_temp")
-    cmdStatus, config.piVolts = commands.getstatusoutput("vcgencmd measure_volts")
     if (config.settingsFlag):
       drawText("Codes", -160, -130, "readout")
       # Print all the DTCs
@@ -423,7 +421,7 @@ while True:
       config.time_elapsed_since_last_action = 0
       #Economize these calls here
       cmdStatus, config.piTemp = commands.getstatusoutput("vcgencmd measure_temp")
-      cmdStatus, config.piVolts = commands.getstatusoutput("vcgencmd measure_volts")
+      cmdStatus, config.piVolt = commands.getstatusoutput("vcgencmd measure_volts")
       cmdStatus, config.piWlan = commands.getstatusoutput("ifconfig wlan0 | grep 'inet ' | awk '{print $2}'")
       cmdStatus, config.piEth = commands.getstatusoutput("ifconfig eth0 | grep 'inet ' | awk '{print $2}'")
 
