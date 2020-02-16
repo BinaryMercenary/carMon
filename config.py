@@ -27,6 +27,8 @@ logIter = 1
 ## but higher value will have flash effect, especially with a padded rpm value
 rpm_grads = 50
 tapTimerWindow = 900
+##ect/engine coolant temperature WARNING threshold (will flash red)
+ectWarn = 96
 
 redline_rpm = 6450 #proper is300 value
 #for normal mode, be sure these match!

@@ -116,8 +116,6 @@ while True:
 
 
 
-    #ktb1 I need to make the disposition string functions ALL += pls
-
     # Load the Logo image.
     try:
       img = pygame.image.load(imgdir + "logo-"  + str(config.dtc_error)  + str(config.dtc_pending)  + str(config.dtc_inc) + ".png")
@@ -352,6 +350,15 @@ while True:
     config.gui_test_time += dt
     config.tapTimer += dt
 
+    #ktb000 coolant temp alert
+    try:
+      ect = str(ecu.coolantTemp).split(" ",1)[0]
+    except:
+      ect = 13 
+    if ((config.time_elapsed_since_last_action/100 % 2) == 0) and (int(ect) > config.ectWarn):
+      hotAlert = pygame.image.load(imgdir + "hotAlert.png")
+      hotAlert_icon = img.get_rect(topleft = (11, 22))
+      windowSurface.blit(hotAlert, (windowSurface.get_rect().centerx - 238, windowSurface.get_rect().centery + 80))
     # Do logs per the specified asynch interval
     if config.time_elapsed_since_last_action > config.log_rate and config.logMetrics:
       #ktb2 inc dbg# os.system("echo ERROR=%s PENDING=%s INCOMPLETE=%s >> ../logs/TEMP.DTCS.LOG" % (config.currentdtc, config.currentPending, config.currentIncomplete))
