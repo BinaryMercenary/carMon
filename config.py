@@ -109,6 +109,8 @@ dtc_error = 0 # 03: Get DTCs
 dtc_pending = 0 # use 07: Get DTCs from the current/last driving cycle
 dtc_inc = 0 #use 0600: Supported MIDs [01-20]
 #dtc_inc = 4 
+piTemp = 0
+piVolt = 0
 
 ##These should probably be lists, not strings BUT really, how many codes do you want to ignore?
 ##You can ignore more than one if you know the order they present it, or feel free to do some code
@@ -122,6 +124,9 @@ selectPending1 = "P0440P0446"
 currentdtc = ""
 currentPending = ""
 currentIncomplete = ""
+
+piWlan = "1.2.3.4"
+piEth = "1.2.3.4"
 
 #lists
 # # currentdtc = []

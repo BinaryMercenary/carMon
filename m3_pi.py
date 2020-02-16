@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 import config, ecu, log, time, datetime, sys
-import pygame, time, os, csv
+import pygame, time, os, csv, commands
 import obd
 from pygame.locals import *
 
@@ -182,8 +182,10 @@ while True:
     # Load your logo
     windowSurface.blit(img, (windowSurface.get_rect().centerx - 105, windowSurface.get_rect().centery + 60))
     # If the settings button has been pressed:
+    cmdStatus, config.piTemp = commands.getstatusoutput("vcgencmd measure_temp")
+    cmdStatus, config.piVolts = commands.getstatusoutput("vcgencmd measure_volts")
     if (config.settingsFlag):
-      drawText("Settings", -160, -145, "readout")
+      drawText("Codes", -160, -130, "readout")
       # Print all the DTCs
       ##debug method
       if ecu.dtc or ecu.pending:
@@ -204,6 +206,10 @@ while True:
       else :
         windowSurface.blit(splasher, (0,0))
         drawText("No DTCs found", 140, 140, "label")
+      ## common text signage here:
+      drawText(" " + config.piWlan + " " + config.piEth, 0, -145, "label")
+      #ugry# drawText("IpAddress", 0, -110, "label")
+      drawText("Pi " + str(config.piTemp), -140, 140, "label")
     else :
       #Calculate coordinates so tachometer is in middle of screen. (gross)
       coords = (windowSurface.get_rect().centerx - 200, windowSurface.get_rect().centery - 200)
@@ -374,12 +380,12 @@ while True:
       ##if fast screen mode then:
       ##LCD minimum
       if not config.deepMetrics:
-        data = [datetime.datetime.today().strftime('%Y%m%d%H%M%S'), RPMP, ecu.speed, ecu.coolantTemp, ecu.intakeTemp, ecu.MAF, ecu.throttlePosition, ecu.engineLoad, config.disposition]
+        data = [datetime.datetime.today().strftime('%Y%m%d%H%M%S'), RPMP, ecu.speed, ecu.coolantTemp, ecu.intakeTemp, ecu.MAF, ecu.throttlePosition, ecu.engineLoad, config.piTemp, config.piVolt, config.disposition]
       else:
         ##Good metrics for an  2001 is300#
-        data = [datetime.datetime.today().strftime('%Y%m%d%H%M%S'), RPMP, ecu.speed, ecu.coolantTemp, ecu.intakeTemp, ecu.MAF, ecu.throttlePosition, ecu.engineLoad, ecu.ltft1, ecu.ltft2, ecu.o2bs1s1, ecu.o2bs1s2, ecu.stft1, ecu.stft2, config.disposition]
+        data = [datetime.datetime.today().strftime('%Y%m%d%H%M%S'), RPMP, ecu.speed, ecu.coolantTemp, ecu.intakeTemp, ecu.MAF, ecu.throttlePosition, ecu.engineLoad, ecu.ltft1, ecu.ltft2, ecu.o2bs1s1, ecu.o2bs1s2, ecu.stft1, ecu.stft2, config.piTemp, config.piVolt, config.disposition]
         ##else long log mode -- this is pretty slow in iso-9141-2
-        #data = [datetime.datetime.today().strftime('%Y%m%d%H%M%S'), RPMP, ecu.speed, ecu.coolantTemp, ecu.intakeTemp, ecu.MAF, ecu.throttlePosition, ecu.engineLoad, ecu.fit, ecu.frpd, ecu.fuelRate, ecu.ltft1, ecu.ltft2, ecu.o2bs1s1, ecu.o2bs1s2, ecu.o2Ltftb1, ecu.o2Ltftb2, ecu.o2Stftb1, ecu.o2Stftb2, ecu.stft1, ecu.stft2, config.disposition]
+        #data = [datetime.datetime.today().strftime('%Y%m%d%H%M%S'), RPMP, ecu.speed, ecu.coolantTemp, ecu.intakeTemp, ecu.MAF, ecu.throttlePosition, ecu.engineLoad, ecu.fit, ecu.frpd, ecu.fuelRate, ecu.ltft1, ecu.ltft2, ecu.o2bs1s1, ecu.o2bs1s2, ecu.o2Ltftb1, ecu.o2Ltftb2, ecu.o2Stftb1, ecu.o2Stftb2, ecu.stft1, ecu.stft2, config.piTemp, config.piVolt, config.disposition]
 
       #ktb11 note that adding text here will flash (badly)
       #ktb4 add an "exiting..." string like this when triple tapped
@@ -415,6 +421,11 @@ while True:
         #if ecu.temp.... #ktb4 log some AUDIT values for temperature or whatever
       # Reset time.
       config.time_elapsed_since_last_action = 0
+      #Economize these calls here
+      cmdStatus, config.piTemp = commands.getstatusoutput("vcgencmd measure_temp")
+      cmdStatus, config.piVolts = commands.getstatusoutput("vcgencmd measure_volts")
+      cmdStatus, config.piWlan = commands.getstatusoutput("ifconfig wlan0 | grep 'inet ' | awk '{print $2}'")
+      cmdStatus, config.piEth = commands.getstatusoutput("ifconfig eth0 | grep 'inet ' | awk '{print $2}'")
 
     ##truncate config.disposition
     config.disposition = ""
