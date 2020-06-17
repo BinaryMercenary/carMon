@@ -32,7 +32,7 @@ def drawText(string, x, y, font):
 ## or
 ## 2) a tie to bash script that does fallsback to ad-hoc ~wifi ap mode to allow in-car tablet tail of logs with ssh/piHelper  ktb99
 ##  the caveats here are a) the wifi will likely be connected at car start (pi's startup delay race condition aside)
-##                       b) this server will interfere with ./optional/scpFiles.sh being able to connect... :| 
+##                       b) this server will interfere with ./optional/scpFiles.sh being able to connect... :|
 # Connect to the ECU.
 if not config.debugFlag:
     try:
@@ -63,13 +63,13 @@ splasher = pygame.image.load("/home/pi/carMon/images/b2f-480x320.png")
 if config.fullscreen:
     os.putenv('SDL_FBDEV', '/dev/fb1')
     pygame.init()
-    pygame.mouse.set_visible(0)
+    #pygame.mouse.set_visible(0)
     windowSurface = pygame.display.set_mode(config.RESOLUTION, FULLSCREEN)
 #assume larger LCD and run windowed
 else :
     os.putenv('SDL_FBDEV', '/dev/fb1')
     pygame.init()
-    pygame.mouse.set_visible(0)
+    #pygame.mouse.set_visible(0)
     windowSurface = pygame.display.set_mode(config.RESOLUTION)
     ## Not sure what GW was doing with this original else:
     # #windowSurface = pygame.display.set_mode(config.RESOLUTION, 0, 32)
@@ -96,6 +96,14 @@ if  config.debugFlag:
     # Get the length of the log.
     logLength = len(list)
 
+# Load the Logo image.
+try:
+  img = pygame.image.load(imgdir + "logo-"  + str(config.dtc_error)  + str(config.dtc_pending)  + str(config.dtc_inc) + ".png")
+except pygame.error:
+  img = pygame.image.load(imgdir + "logo-330.png")
+img_button = img.get_rect(topleft = (135, 220))
+
+
 # Run the game loop
 while True:
     #I should consider addding a re-connect using some of the logic from the big bad DTC squasher - ktb5
@@ -113,16 +121,6 @@ while True:
     #  config.dtc_inc = len(ecu.incompleteMon)
     #else:
     #  config.dtc_inc = 0
-
-
-
-    # Load the Logo image.
-    try:
-      img = pygame.image.load(imgdir + "logo-"  + str(config.dtc_error)  + str(config.dtc_pending)  + str(config.dtc_inc) + ".png")
-    except pygame.error:
-      img = pygame.image.load(imgdir + "logo-330.png")
-    img_button = img.get_rect(topleft = (135, 220))
-
 
     #this will need wrapped up better pls ktb
     #ktb1 config.dtc_inc need to be built
@@ -167,7 +165,7 @@ while True:
     ## let's add a single-session script that runs a bash scp job ktb9
     ## to push all the files to designated server ONLY when rpms == 0 (tho probably AFTER a run, and not before?)
     ## if .. ~conditions:
-    ##   os.system("./optional/scpFiles.sh") 
+    ##   os.system("./optional/scpFiles.sh")
     if not config.debugFlag:
       #Figure out what tach image should be.
       ecu.getTach()
@@ -247,7 +245,7 @@ while True:
       drawText("Coolant", -170, 140, "label")
 
       # Draw the intake temp readout and label.i
-      drawText(str(ecu.intakeTemp) + "", 190, 105, "readout") #"\xb0C" not want - Need ecu.ktb3 ktb1 -- use string replace pls 
+      drawText(str(ecu.intakeTemp) + "", 190, 105, "readout") #"\xb0C" not want - Need ecu.ktb3 ktb1 -- use string replace pls
       drawText("Intake", 190, 140, "label")
 
       # Draw the gear readout and label.
@@ -358,7 +356,7 @@ while True:
     try:
       ect = str(ecu.coolantTemp).split(" ",1)[0]
     except:
-      ect = 13 
+      ect = 13
     if ((config.time_elapsed_since_last_action/100 % 2) == 0) and (int(ect) > config.ectWarn):
       hotAlert = pygame.image.load(imgdir + "hotAlert.png")
       hotAlert_icon = img.get_rect(topleft = (11, 22))
@@ -431,7 +429,7 @@ while True:
     pygame.display.update()
 
     #ecu.dtc = "P0440"
-    
+
     if ecu.dtc or ecu.pending:
       if ecu.pending:
         config.currentPending = ""
@@ -489,5 +487,6 @@ while True:
         ecu.dtc = None
         #ktb4 DTCDBG entries would ideally appear in the csv as part of the disposition string or AT LEAST be dated...
         os.system("echo 'carMon has cleared matched DTC Code(s)' >> ../logs/TEMP.DTCDBG.LOG" )
-        
+
+
 
