@@ -11,7 +11,7 @@
   Fork of Geoffrey Wacker's (GW) Cal Poly SLO project, initially for M3 but will be adapting to IS300 and making more generic/portable as time permits.
 (See https://digitalcommons.calpoly.edu/cpesp/235)
 
-  N.B./nota bene/ATTENTION: Generic OBD2/ISO-9141-2 (and even M-VCI) is NOT a realtime system, as is noted be the original author RE using this display:
+  N.B./nota bene/ATTENTION: Generic OBD2/ISO-9141-2 (and even M-VCI) is NOT a realtime system, as is noted by the original author RE using this display:
 
 
   From GW's PDF, _"As for the hardware, I’d like to transition from the Raspberry Pi 3 to a Raspberry Pi Zero W.  I have no need for the extra processing power that the Pi 3 provides, so the Zero W would be a great choice due to its extremely small form factor and even lower cost.  I’d also like to explore the possibility of directly connecting to the vehicle’s CAN (controller area network) bus instead of OBD-II.  The response time of OBD-II is somewhat lacking, and it can take up to a second to get new data.  This is acceptable for data that doesn’t change often like temperatures, but terrible for things like RPM, throttle position, and speed.  Connecting directly over CAN would hopefully eliminate the response time issues, and would open up the door to actually controlling things in the car that communicate over CAN bus (lock the doors, switch on lights, etc.)." -- GW_
