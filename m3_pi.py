@@ -63,13 +63,13 @@ splasher = pygame.image.load("/home/pi/carMon/images/b2f-480x320.png")
 if config.fullscreen:
     os.putenv('SDL_FBDEV', '/dev/fb1')
     pygame.init()
-    #pygame.mouse.set_visible(0)
+    pygame.mouse.set_visible(0)
     windowSurface = pygame.display.set_mode(config.RESOLUTION, FULLSCREEN)
 #assume larger LCD and run windowed
 else :
     os.putenv('SDL_FBDEV', '/dev/fb1')
     pygame.init()
-    #pygame.mouse.set_visible(0)
+    pygame.mouse.set_visible(0)
     windowSurface = pygame.display.set_mode(config.RESOLUTION)
     ## Not sure what GW was doing with this original else:
     # #windowSurface = pygame.display.set_mode(config.RESOLUTION, 0, 32)
