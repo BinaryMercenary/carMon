@@ -10,7 +10,6 @@ ports = obd.scan_serial()
 print ports
 
 # DEBUG: Set debug logging so we can see everything that is happening.
-#obd.logger.setLevel(obd.logging.WARNING)
 obd.logger.setLevel(obd.logging.DEBUG)
 
 # Connect to the ECU.

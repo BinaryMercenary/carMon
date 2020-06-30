@@ -11,7 +11,6 @@ import numpy as np
 
 ##  Globals.
 ## Inits to 0
-frameSleep = 0.03
 logLength = 0
 dtc_iter = 0
 time_elapsed_since_last_action = 0

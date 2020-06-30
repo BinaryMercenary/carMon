@@ -27,12 +27,32 @@ def drawText(string, x, y, font):
   textRect.centery = windowSurface.get_rect().centery + y
   windowSurface.blit(text, textRect)
 
-# Load the Logo image.
-try:
-  img = pygame.image.load(imgdir + "logo-"  + str(config.dtc_error)  + str(config.dtc_pending)  + str(config.dtc_inc) + ".png")
-except pygame.error:
-  img = pygame.image.load(imgdir + "logo-330.png")
-img_button = img.get_rect(topleft = (135, 220))
+## Let's add a basic handler here:
+## 1) show the ip of the pi on second screen for ppl who don't wanna run `arp-scan -l | grep -v "b8:27"` or ifconfig commands ktb3
+## or
+## 2) a tie to bash script that does fallsback to ad-hoc ~wifi ap mode to allow in-car tablet tail of logs with ssh/piHelper  ktb99
+##  the caveats here are a) the wifi will likely be connected at car start (pi's startup delay race condition aside)
+##                       b) this server will interfere with ./optional/scpFiles.sh being able to connect... :| 
+# Connect to the ECU.
+if not config.debugFlag:
+    try:
+      # #obd.logger.setLevel(obd.logging.DEBUG)
+      launchy = ecu.ecuThread()
+    except:
+      #shoot, this doesn't work -- you need some kind of watchdog or sth tricky ktb5
+      print "It's just too much, I can't handle it anymore -- anon"
+      sys.exit()
+
+    # Give time for the ECU to connect before we start the GUI.
+    while not config.ecuReady:
+      ## a careful if statement with a toggler var could get me flashing gauge at startup qqq ktb6
+      time.sleep(.03) #is 100fps a goal when GW's POC was 55fps? ktb4 slow the roll?
+      ##if you want to watch values write them to the logs and use watch with ls -t and tail #ktbdoc
+# Load all of our tach images into an array so we can easily access them.
+background_dir = 'tach/'
+background_files = ['%i.png' % i for i in range(0, config.rpm_grads + 1)]
+ground = [pygame.image.load(os.path.join("/home/pi/carMon/images/", file)) for file in background_files]
+
 
 # Load the Logo image.
 splasher = pygame.image.load("/home/pi/carMon/images/b2f-480x320.png")
@@ -65,36 +85,6 @@ pygame.display.set_caption('M3 PI')
 # Create a clock object to use so we can log every second.
 clock = pygame.time.Clock()
 
-# Load all of our tach images into an array so we can easily access them.
-background_dir = 'tach/'
-background_files = ['%i.png' % i for i in range(0, config.rpm_grads + 1)]
-ground = [pygame.image.load(os.path.join("/home/pi/carMon/images/", file)) for file in background_files]
-
-# image test for no-X mode:
-#tbd ktb
-
-## Let's add a basic handler here:
-## 1) show the ip of the pi on second screen for ppl who don't wanna run `arp-scan -l | grep -v "b8:27"` or ifconfig commands ktb3
-## or
-## 2) a tie to bash script that does fallsback to ad-hoc ~wifi ap mode to allow in-car tablet tail of logs with ssh/piHelper  ktb99
-##  the caveats here are a) the wifi will likely be connected at car start (pi's startup delay race condition aside)
-##                       b) this server will interfere with ./optional/scpFiles.sh being able to connect... :|
-# Connect to the ECU.
-if not config.debugFlag:
-    try:
-      # #obd.logger.setLevel(obd.logging.DEBUG)
-      launchy = ecu.ecuThread()
-    except:
-      #shoot, this doesn't work -- you need some kind of watchdog or sth tricky ktb5
-      print "It's just too much, I can't handle it anymore -- anon"
-      sys.exit()
-
-    # Give time for the ECU to connect before we start the GUI.
-    while not config.ecuReady:
-      ## a careful if statement with a toggler var could get me flashing gauge at startup qqq ktb6
-      time.sleep(config.frameSleep) #is 100fps a goal when GW's POC was 55fps? ktb4 slow the roll?
-      ##if you want to watch values write them to the logs and use watch with ls -t and tail #ktbdoc
-
 # Create the csv log file with the specified header.
 log.createLog(["TIME", "RPM", "SPEED", "COOLANT_TEMP", "INTAKE_TEMP", "MAF", "THROTTLE_POS", "ENGINE_LOAD"])
 
@@ -123,6 +113,16 @@ while True:
     #  config.dtc_inc = len(ecu.incompleteMon)
     #else:
     #  config.dtc_inc = 0
+
+
+
+    # Load the Logo image.
+    try:
+      img = pygame.image.load(imgdir + "logo-"  + str(config.dtc_error)  + str(config.dtc_pending)  + str(config.dtc_inc) + ".png")
+    except pygame.error:
+      img = pygame.image.load(imgdir + "logo-330.png")
+    img_button = img.get_rect(topleft = (135, 220))
+
 
     #this will need wrapped up better pls ktb
     #ktb1 config.dtc_inc need to be built
@@ -167,7 +167,7 @@ while True:
     ## let's add a single-session script that runs a bash scp job ktb9
     ## to push all the files to designated server ONLY when rpms == 0 (tho probably AFTER a run, and not before?)
     ## if .. ~conditions:
-    ##   os.system("./optional/scpFiles.sh")
+    ##   os.system("./optional/scpFiles.sh") 
     if not config.debugFlag:
       #Figure out what tach image should be.
       ecu.getTach()
@@ -247,7 +247,7 @@ while True:
       drawText("Coolant", -170, 140, "label")
 
       # Draw the intake temp readout and label.i
-      drawText(str(ecu.intakeTemp) + "", 190, 105, "readout") #"\xb0C" not want - Need ecu.ktb3 ktb1 -- use string replace pls
+      drawText(str(ecu.intakeTemp) + "", 190, 105, "readout") #"\xb0C" not want - Need ecu.ktb3 ktb1 -- use string replace pls 
       drawText("Intake", 190, 140, "label")
 
       # Draw the gear readout and label.
@@ -358,7 +358,7 @@ while True:
     try:
       ect = str(ecu.coolantTemp).split(" ",1)[0]
     except:
-      ect = 13
+      ect = 13 
     if ((config.time_elapsed_since_last_action/100 % 2) == 0) and (int(ect) > config.ectWarn):
       hotAlert = pygame.image.load(imgdir + "hotAlert.png")
       hotAlert_icon = img.get_rect(topleft = (11, 22))
@@ -431,7 +431,7 @@ while True:
     pygame.display.update()
 
     #ecu.dtc = "P0440"
-
+    
     if ecu.dtc or ecu.pending:
       if ecu.pending:
         config.currentPending = ""
@@ -469,7 +469,7 @@ while True:
         config.ecuReady = False
         ecu.ecuThread()
         while not config.ecuReady:
-          time.sleep(config.frameSleep) #is 100fps a goal when GW's POC was 55fps? ktb4 slow the roll?
+          time.sleep(.03) #is 100fps a goal when GW's POC was 55fps? ktb4 slow the roll?
 
         #might need a while loop here for RPM pls ktb2 - it's about 10 seconds on the ecu sim so.. for now
         time.sleep(11) #OR carefull tweak/ehnance this with ktb3 proly use connection( .is_connected .running  .status)
@@ -481,7 +481,7 @@ while True:
         config.ecuReady = False
         ecu.ecuThread()
         while not config.ecuReady:
-          time.sleep(config.frameSleep) #is 100fps a goal when GW's POC was 55fps? ktb4 slow the roll?
+          time.sleep(.03) #is 100fps a goal when GW's POC was 55fps? ktb4 slow the roll?
 
         #A code reset should only once per app start pls, to avoid anything nasty from being hidden
         config.autoclearSDTC = False
@@ -489,7 +489,5 @@ while True:
         ecu.dtc = None
         #ktb4 DTCDBG entries would ideally appear in the csv as part of the disposition string or AT LEAST be dated...
         os.system("echo 'carMon has cleared matched DTC Code(s)' >> ../logs/TEMP.DTCDBG.LOG" )
-
-
-
+        
 
