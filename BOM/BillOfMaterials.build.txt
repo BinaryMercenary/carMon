@@ -1,0 +1,11 @@
+### MY CURRENT BUILD ###
+
+SD_CARD: 16GB class 10 (ATP Rugged)
+   MOBO: Pi 3B Plus
+    LCD: waveshare ili9486 (GPIO Based, not HDMI)*
+    PSU: repurposed basic cigarette lighter adapter (chop, chop)
+   CASE: Basic black abs plastic, fanless (shroud for heat shield may be wise)
+   OBD2: ELM based bluetooth (MAC address is ~hard-coded in addition to pairing, USB2serial fallback)
+
+*After seeing every power supply I tried get low power warnings, I hardwired the LCD's power to not depend on the Pi.
+...I also added a direct power feed to the pi (not using the usb header for power).

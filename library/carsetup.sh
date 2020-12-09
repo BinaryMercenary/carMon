@@ -1,11 +1,15 @@
 echo '#!/bin/bash
 
-## For a good time, buy
-# https://mausberry-circuits.myshopify.com/collections/frontpage/products/4amp-car-supply-switch
-## follow directions from:
-# https://mausberry-circuits.myshopify.com/pages/car-setup
-## Disclaimer - seeing random yellow underamp even with  my wall wart, this mausberry is not magic 
 
+## phasing this out:
+# the mausberry I bought failed very early on.  I was unable to get respectable (any) reply from the vendor.
+# I wish him well but can't patronize nor recommend the vendor.
+# SURPRISINGLY, I've been running with no shutdown for over a year now without incident.
+# Unsafe shutdown's aren't as big a deal in this lineup.
+# So, as an alternative, you can just hardwire a 12v-5v DC-DC PUPS (2.5A!) to IGN and ground and viola.
+# I use a jumper to defeat this script, but better yet, don't use it.  (was keeping my options open)
+
+## pressing on? ok:
 #this is the GPIO pin connected to the lead on switch labeled OUT
 GPIOpin1=5 # This is pin 29, I promise.
 ##ALSO NOTE - in the absence of the mausberry signals
@@ -66,12 +70,3 @@ sudo chmod 777 /etc/switch.sh
 sudo sed -i '/etc\/switch.sh &/d' /etc/rc.local
 sudo sed -i '$ i /etc/switch.sh &' /etc/rc.local
 
-
-
-
-##ktb9 275 seconds on return from asia 101 my system was not on
-#did it have a power event and reset? did it 
-#from 
-#20200126205303
-#20200126205406
-#is 103 seconds...
