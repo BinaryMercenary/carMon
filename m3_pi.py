@@ -249,7 +249,7 @@ while True:
 
     #Debug code
     try:
-      afrv = ( float(ecu.o2bs1s1.magnitude) + float(ecu.o2bs1s2.magnitude) / 2 )
+      afrv = ( ( float(ecu.o2bs1s1.magnitude) + float(ecu.o2bs1s2.magnitude) ) / 2 )
     except:
       afrv = .8
     #afrv = random.uniform(0.01, 0.99)
