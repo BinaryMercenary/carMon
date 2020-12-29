@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 import config, ecu, log, time, datetime, sys
 import pygame, time, os, csv, commands
+import random
 import obd
 from pygame.locals import *
 
@@ -32,7 +33,7 @@ def drawText(string, x, y, font):
 ## or
 ## 2) a tie to bash script that does fallsback to ad-hoc ~wifi ap mode to allow in-car tablet tail of logs with ssh/piHelper  ktb99
 ##  the caveats here are a) the wifi will likely be connected at car start (pi's startup delay race condition aside)
-##                       b) this server will interfere with ./optional/scpFiles.sh being able to connect... :| 
+##                       b) this server will interfere with ./optional/scpFiles.sh being able to connect... :|
 # Connect to the ECU.
 if not config.debugFlag:
     try:
@@ -53,6 +54,12 @@ background_dir = 'tach/'
 background_files = ['%i.png' % i for i in range(0, config.rpm_grads + 1)]
 ground = [pygame.image.load(os.path.join("/home/pi/carMon/images/", file)) for file in background_files]
 
+# Load the AFR stencil/background.
+afrsp = pygame.image.load("/home/pi/carMon/images/afrSplash.png")
+
+# Load the AFR blocker/FG sprite(s).
+afrbl = pygame.image.load("/home/pi/carMon/images/afrBlocker.png")
+afrOff = pygame.image.load("/home/pi/carMon/images/afrOff.png")
 
 # Load the Logo image.
 splasher = pygame.image.load("/home/pi/carMon/images/b2f-480x320.png")
@@ -167,7 +174,7 @@ while True:
     ## let's add a single-session script that runs a bash scp job ktb9
     ## to push all the files to designated server ONLY when rpms == 0 (tho probably AFTER a run, and not before?)
     ## if .. ~conditions:
-    ##   os.system("./optional/scpFiles.sh") 
+    ##   os.system("./optional/scpFiles.sh")
     if not config.debugFlag:
       #Figure out what tach image should be.
       ecu.getTach()
@@ -178,8 +185,99 @@ while True:
     # Clear the screen
     windowSurface.fill(config.BLACK)
 
+    # afr time!
+    windowSurface.blit(afrsp, (340,75))
 
-    # Load your logo
+    #Row 1 afr
+    try:
+      afrv = float(ecu.o2bs1s1.magnitude)
+    except:
+      afrv = .8
+
+    afry = 0 ## set row 1
+    if afrv < 0.07:     ## LEANer than 16.Xpetrol
+      afrx = [0,1,1,1,1,1,1]
+    elif afrv < 0.2:    ## Leaner than 14.9petrol
+      afrx = [1,0,1,1,1,1,1]
+    elif afrv < 0.33:   ## Below stocio lambda1 or 14.7petrol
+      afrx = [1,1,0,1,1,1,1]
+    elif afrv < 0.7:    ## Richer than lambda0.95 or 14petrol
+      afrx = [1,1,1,0,1,1,1]
+    elif afrv < 0.8:    ## Rich
+      afrx = [1,1,1,1,0,1,1]
+    elif afrv < 0.9:    ## RICH
+      afrx = [1,1,1,1,1,0,1]
+    elif afrv < 0.925:  ## RICH AF - got your pops on decel!
+      afrx = [1,1,1,1,1,1,0]
+
+    #Paint mask over row 1
+    j = 0
+    for i in afrx:
+      j = j + 1
+      if i == 1:
+        windowSurface.blit(afrOff, (320 + (20 * j),75 + (20 * afry)))
+
+    #Row 3 afr
+    try:
+      afrv = float(ecu.o2bs1s2.magnitude)
+    except:
+      afrv = .8
+
+    afry = 2 ## set row
+    if afrv < 0.07:     ## LEANer than 16.Xpetrol
+      afrx = [0,1,1,1,1,1,1]
+    elif afrv < 0.2:    ## Leaner than 14.9petrol
+      afrx = [1,0,1,1,1,1,1]
+    elif afrv < 0.33:   ## Below stocio lambda1 or 14.7petrol
+      afrx = [1,1,0,1,1,1,1]
+    elif afrv < 0.7:    ## Richer than lambda0.95 or 14petrol
+      afrx = [1,1,1,0,1,1,1]
+    elif afrv < 0.8:    ## Rich
+      afrx = [1,1,1,1,0,1,1]
+    elif afrv < 0.9:    ## RICH
+      afrx = [1,1,1,1,1,0,1]
+    elif afrv < 0.925:  ## RICH AF - got your pops on decel!
+      afrx = [1,1,1,1,1,1,0]
+
+    #Paint mask over row 3
+    j = 0
+    for i in afrx:
+      j = j + 1
+      if i == 1:
+        windowSurface.blit(afrOff, (320 + (20 * j),75 + (20 * afry)))
+
+
+    #Debug code
+    try:
+      afrv = ( ( float(ecu.o2bs1s1.magnitude) + float(ecu.o2bs1s2.magnitude) ) / 2 )
+    except:
+      afrv = .8
+    #afrv = random.uniform(0.01, 0.99)
+
+    afry = 1 ## set row
+    if afrv < 0.07:     ## LEANer than 16.Xpetrol
+      afrx = [0,1,1,1,1,1,1]
+    elif afrv < 0.2:    ## Leaner than 14.9petrol
+      afrx = [1,0,1,1,1,1,1]
+    elif afrv < 0.33:   ## Below stocio lambda1 or 14.7petrol
+      afrx = [1,1,0,1,1,1,1]
+    elif afrv < 0.7:    ## Richer than lambda0.95 or 14petrol
+      afrx = [1,1,1,0,1,1,1]
+    elif afrv < 0.8:    ## Rich
+      afrx = [1,1,1,1,0,1,1]
+    elif afrv < 0.9:    ## RICH
+      afrx = [1,1,1,1,1,0,1]
+    elif afrv < 0.925:  ## RICH AF - got your pops on decel!
+      afrx = [1,1,1,1,1,1,0]
+
+    #Paint mask over row 2
+    j = 0
+    for i in afrx:
+      j = j + 1
+      if i == 1:
+        windowSurface.blit(afrbl, (320 + (20 * j),75 + (20 * afry)))
+
+    # Paint your logo
     windowSurface.blit(img, (windowSurface.get_rect().centerx - 105, windowSurface.get_rect().centery + 60))
     # If the settings button has been pressed:
     if (config.settingsFlag):
@@ -213,7 +311,7 @@ while True:
       coords = (windowSurface.get_rect().centerx - 200, windowSurface.get_rect().centery - 200)
 
 
-      # Load the tach image
+      # Paint the tach image
       if ecu.tach_iter >= 0:
         windowSurface.blit(ground[ecu.tach_iter], coords)
       ## Attention listeners at home - this device's code is hinged around RPM, so we use it as the "Proof of Life"
@@ -247,7 +345,7 @@ while True:
       drawText("Coolant", -170, 140, "label")
 
       # Draw the intake temp readout and label.i
-      drawText(str(ecu.intakeTemp) + "", 190, 105, "readout") #"\xb0C" not want - Need ecu.ktb3 ktb1 -- use string replace pls 
+      drawText(str(ecu.intakeTemp) + "", 190, 105, "readout") #"\xb0C" not want - Need ecu.ktb3 ktb1 -- use string replace pls
       drawText("Intake", 190, 140, "label")
 
       # Draw the gear readout and label.
@@ -358,7 +456,7 @@ while True:
     try:
       ect = str(ecu.coolantTemp).split(" ",1)[0]
     except:
-      ect = 13 
+      ect = 13
     if ((config.time_elapsed_since_last_action/100 % 2) == 0) and (int(ect) > config.ectWarn):
       hotAlert = pygame.image.load(imgdir + "hotAlert.png")
       hotAlert_icon = img.get_rect(topleft = (11, 22))
@@ -431,7 +529,7 @@ while True:
     pygame.display.update()
 
     #ecu.dtc = "P0440"
-    
+
     if ecu.dtc or ecu.pending:
       if ecu.pending:
         config.currentPending = ""
@@ -489,5 +587,7 @@ while True:
         ecu.dtc = None
         #ktb4 DTCDBG entries would ideally appear in the csv as part of the disposition string or AT LEAST be dated...
         os.system("echo 'carMon has cleared matched DTC Code(s)' >> ../logs/TEMP.DTCDBG.LOG" )
-        
+
+
+
 
