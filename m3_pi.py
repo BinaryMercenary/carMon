@@ -249,7 +249,7 @@ while True:
 
     #Debug code
     try:
-      afrv = ( ( float(ecu.o2bs1s1.magnitude) + float(ecu.o2bs1s2.magnitude) ) / 2 )
+      afrv = ( float(ecu.o2bs1s1.magnitude) + float(ecu.o2bs1s2.magnitude) / 2 )
     except:
       afrv = .8
     #afrv = random.uniform(0.01, 0.99)
@@ -585,8 +585,8 @@ while True:
         config.autoclearSDTC = False
         config.autoclearECU = False #kinda repetitive...
         ecu.dtc = None
-        #ktb4 DTCDBG entries would ideally appear in the csv as part of the disposition string or AT LEAST be dated...
-        os.system("echo 'carMon has cleared matched DTC Code(s)' >> ../logs/TEMP.DTCDBG.LOG" )
+        #ktb4 DTCDBG entries would ideally appear in the csv as part of the disposition string
+        os.system('echo "carMon has cleared matched DTC Code(s) `date +%Y-%m-%d-%H%M` Zulu"' )
 
 
 
