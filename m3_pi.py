@@ -303,7 +303,7 @@ while True:
     windowSurface.blit(img, (windowSurface.get_rect().centerx - 105, windowSurface.get_rect().centery + 60))
     # If the settings button has been pressed:
     if (config.settingsFlag):
-      drawText("Codes - Push&Hold2Clear", 0, -130, "readout")
+      drawText("Codes - Push&Hold2Clear", 0, -110 "readout")
       # Print all the DTCs
       ##debug method
       if ecu.dtc or ecu.pending:
