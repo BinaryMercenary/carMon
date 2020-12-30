@@ -136,14 +136,28 @@ while True:
     #ktb2 wrap this with if not 0 0 0 later pls (sum them up)
     config.disposition = config.disposition + "  CODES(" + str(config.dtc_error) + str(config.dtc_pending) + str(config.dtc_inc) + ") DTC(" + config.currentdtc + ") PEN(" + config.currentPending + ")"
 
+    click = pygame.mouse.get_pressed()
+    if config.holdCount > 30:
+      os.system('echo "USER has cleared ALL DTC Code(s) `date +%Y-%m-%d-%H%M` Zulu" >> ../logs/EVENTS.LOG' )
+      config.holdCount = 0
+      ## take action! (...)      
+    if click[0] == False: # evaluate left button
+      config.holdCount = 0
+    if click[0] == True: # evaluate left button
+      config.holdCount += 1
+      os.system("echo CLICKING holdCount=%i  >> ../logs/EVENTS.LOG" % (config.holdCount))
+      time.sleep(.1)
+      #break
     for event in pygame.event.get():
+      if event.type == MOUSEBUTTONUP:
+         config.holdCount = 0
       if event.type == MOUSEBUTTONDOWN:
         #Toggle the settings flag when the screen is touched.
+        os.system("echo first MOUSING holdCount=%i  >> ../logs/EVENTS.LOG" % (config.holdCount))
         config.settingsFlag = not config.settingsFlag
         config.tapCount += 1
-        # kb events splash mode -- playback the dummy/debug file again
-        #
-        ## This is working as expected now
+        #kb events splash mode -- playback the dummy/debug file again
+        #This is working as expected now
         config.debugFlag = True
       if event.type == QUIT or config.tapCount > 2:
         #Rename our CSV to include end time.
@@ -151,6 +165,7 @@ while True:
         # Close the connection to the ECU.
         ecu.connection.close()
         pygame.quit()
+        os.system('echo "USER has quit carMon `date +%Y-%m-%d-%H%M` Zulu" >> ../logs/EVENTS.LOG' )
         sys.exit()
 
     if config.tapTimer > config.tapTimerWindow:
@@ -167,6 +182,7 @@ while True:
         #This does NOT reduce read-load on the ECU conn. ktb9 Find a better use for the double tap?
         #ktb3 maybe I should do an image as a third screen? since that would be unavailable when dtcs exist
         # no point # config.deepMetrics = not config.deepMetrics
+        os.system('echo "USER has cleared stats `date +%Y-%m-%d-%H%M` zulu" >> ../logs/EVENTS.LOG' )
       config.tapTimer = 0
       config.tapCount = 0
 
@@ -249,7 +265,7 @@ while True:
 
     #Debug code
     try:
-      afrv = ( float(ecu.o2bs1s1.magnitude) + float(ecu.o2bs1s2.magnitude) / 2 )
+      afrv = ( ( float(ecu.o2bs1s1.magnitude) + float(ecu.o2bs1s2.magnitude) ) / 2 )
     except:
       afrv = .8
     #afrv = random.uniform(0.01, 0.99)
@@ -586,7 +602,7 @@ while True:
         config.autoclearECU = False #kinda repetitive...
         ecu.dtc = None
         #ktb4 DTCDBG entries would ideally appear in the csv as part of the disposition string
-        os.system('echo "carMon has cleared matched DTC Code(s) `date +%Y-%m-%d-%H%M` Zulu"' )
+        os.system('echo "carMon has cleared matched DTC Code(s) `date +%Y-%m-%d-%H%M` Zulu" >> ../logs/EVENTS.LOG' )
 
 
 
