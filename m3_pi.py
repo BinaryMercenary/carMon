@@ -10,6 +10,7 @@ from pygame.locals import *
 #where RPMP 0 means never use RPMP, else do use RPMP
 RPMP = 0
 peakMAF = 0
+resetter = 0
 
 #this is part of the repo and there for NOT in config
 imgdir = "/home/pi/carMon/images/"
@@ -23,6 +24,8 @@ def drawText(string, x, y, font):
     text = labelFont.render(string, True, config.WHITE)
   elif font == "fps":
     text = fpsFont.render(string, True, config.WHITE)
+  elif font == "bold":
+    text = boldFont.render(string, True, config.BLACK)
   textRect = text.get_rect()
   textRect.centerx = windowSurface.get_rect().centerx + x
   textRect.centery = windowSurface.get_rect().centery + y
@@ -82,6 +85,7 @@ else :
     # #windowSurface = pygame.display.set_mode(config.RESOLUTION, 0, 32)
 
 # Set up fonts
+boldFont = pygame.font.Font("/home/pi/carMon/fonts/TitilliumWeb-Light.ttf", 65)
 readoutFont = pygame.font.Font("/home/pi/carMon/fonts/TitilliumWeb-Light.ttf", 40)
 labelFont = pygame.font.Font("/home/pi/carMon/fonts/TitilliumWeb-Light.ttf", 30)
 fpsFont = pygame.font.Font("/home/pi/carMon/fonts/TitilliumWeb-Light.ttf", 20)
@@ -138,9 +142,11 @@ while True:
 
     click = pygame.mouse.get_pressed()
     if config.holdCount > 30:
-      os.system('echo "USER has cleared ALL DTC Code(s) `date +%Y-%m-%d-%H%M` Zulu" >> ../logs/EVENTS.LOG' )
+      os.system('echo "USER has requested clear DTC Code(s) `date +%Y-%m-%d-%H%M` Zulu" >> ../logs/EVENTS.LOG' )
       config.holdCount = 0
-      ## take action! (...)      
+      ## take action! (...)     
+      resetter = True
+      config.autoclearECU = True
     if click[0] == False: # evaluate left button
       config.holdCount = 0
     if click[0] == True: # evaluate left button
@@ -297,7 +303,7 @@ while True:
     windowSurface.blit(img, (windowSurface.get_rect().centerx - 105, windowSurface.get_rect().centery + 60))
     # If the settings button has been pressed:
     if (config.settingsFlag):
-      drawText("Codes", -160, -130, "readout")
+      drawText("Codes - Push&Hold2Clear", 0, -130, "readout")
       # Print all the DTCs
       ##debug method
       if ecu.dtc or ecu.pending:
@@ -574,36 +580,47 @@ while True:
         #os.system("echo  ERRORS   GOT=%i EXP=%i ***** >> ../logs/TEMP.DTCDBG.LOG" % ((len(config.currentdtc)), (len(config.selectdtc1))))
         os.system("echo  ERRORS   GOT=%i EXP=%i '*****' >> ../logs/TEMP.DTCDBG.LOG" % ((len(config.currentdtc)), (len(config.selectdtc1))))
         os.system("echo  pending  got=%i exp=%i >> ../logs/TEMP.DTCDBG.LOG" % ((len(config.currentPending)), (len(config.selectPending1))))
-
-        ##dear ~god~ globalInterpreter of  python with multiThreading...
-        ##This is the same technique that would be needed to toggle the deepMetrics, I'll pass...
-        ecu.connection.close()
-        time.sleep(11)  #I tried to lower this to even 9 sec, locks up. ktb3 proly use connection( .close .is_connected .running  .status)
+        os.system('echo "Carmon requesting clear of matched DTC Code(s) `date +%Y-%m-%d-%H%M` Zulu" >> ../logs/EVENTS.LOG' )
+        resetter = True
         config.autoclearECU = True
-        config.ecuReady = False
-        ecu.ecuThread()
-        while not config.ecuReady:
-          time.sleep(.03) #is 100fps a goal when GW's POC was 55fps? ktb4 slow the roll?
 
-        #might need a while loop here for RPM pls ktb2 - it's about 10 seconds on the ecu sim so.. for now
-        time.sleep(11) #OR carefull tweak/ehnance this with ktb3 proly use connection( .is_connected .running  .status)
+    ## big bad and user dtc squashes
+    if resetter and config.autoclearECU:
+      windowSurface.fill(config.ORANGE)
+      drawText("CLEARING DTCs", 0, 0, "bold")
+      pygame.display.update()
+      ##dear ~god~ globalInterpreter of  python with multiThreading...
+      ##This is the same technique that would be needed to toggle the deepMetrics, I'll pass...
+      ecu.connection.close()
+      time.sleep(11)  #I tried to lower this to even 9 sec, locks up. ktb3 proly use connection( .close .is_connected .running  .status)
+      config.ecuReady = False
+      ecu.ecuThread()
+      while not config.ecuReady:
+        time.sleep(.03) #is 100fps a goal when GW's POC was 55fps? ktb4 slow the roll?
 
-        ## probably no need for unwatch_all
-        ecu.connection.close()
-        time.sleep(11)  #I tried to lower this to even 9 sec, locks up. ktb3 proly use connection( .close .is_connected .running  .status)
-        config.autoclearECU = False
-        config.ecuReady = False
-        ecu.ecuThread()
-        while not config.ecuReady:
-          time.sleep(.03) #is 100fps a goal when GW's POC was 55fps? ktb4 slow the roll?
+      #might need a while loop here for RPM pls ktb2 - it's about 10 seconds on the ecu sim so.. for now
+      time.sleep(11) #OR carefull tweak/ehnance this with ktb3 proly use connection( .is_connected .running  .status)
+      #ktb4 DTCDBG entries would ideally appear in the csv as part of the disposition string
+      os.system('echo "cleared ALL DTC Code(s) `date +%Y-%m-%d-%H%M` Zulu" >> ../logs/EVENTS.LOG' )
+      #A code reset should only once per app start pls, to avoid anything nasty from being hidden
+      config.autoclearSDTC = False #pls treat as immutable for the rest of this session!!!
+      config.autoclearECU = False #kinda repetitive...
+      ecu.dtc = None
 
-        #A code reset should only once per app start pls, to avoid anything nasty from being hidden
-        config.autoclearSDTC = False
-        config.autoclearECU = False #kinda repetitive...
-        ecu.dtc = None
-        #ktb4 DTCDBG entries would ideally appear in the csv as part of the disposition string
-        os.system('echo "carMon has cleared matched DTC Code(s) `date +%Y-%m-%d-%H%M` Zulu" >> ../logs/EVENTS.LOG' )
-
-
-
+    #this must follows big bad and user dtc squashes
+    #OR can be used for generic connection resets by setting resetter = TRUE with future watchdog ktb2
+    if resetter:
+      windowSurface.fill(config.LIME)
+      drawText("RECONNECTING", 0, 0, "bold")
+      pygame.display.update()
+      resetter = False
+      ## probably no need for unwatch_all
+      ecu.connection.close()
+      time.sleep(11)  #I tried to lower this to even 9 sec, locks up. ktb3 proly use connection( .close .is_connected .running  .status)
+      config.autoclearECU = False
+      config.ecuReady = False
+      ecu.ecuThread()
+      while not config.ecuReady:
+        time.sleep(.03) #is 100fps a goal when GW's POC was 55fps? ktb4 slow the roll?
+      os.system('echo "Connection restarted `date +%Y-%m-%d-%H%M` Zulu" >> ../logs/EVENTS.LOG' )
 
