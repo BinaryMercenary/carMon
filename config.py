@@ -16,6 +16,7 @@ dtc_iter = 0
 time_elapsed_since_last_action = 0
 tapTimer = 0
 tapCount = 0
+holdCount = 0
 gui_test_time = 0
 lastSpeed = 0 #I may not need this var anymore
 
