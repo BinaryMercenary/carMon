@@ -140,6 +140,7 @@ while True:
     #ktb2 wrap this with if not 0 0 0 later pls (sum them up)
     config.disposition = config.disposition + "  CODES(" + str(config.dtc_error) + str(config.dtc_pending) + str(config.dtc_inc) + ") DTC(" + config.currentdtc + ") PEN(" + config.currentPending + ")"
 
+    #Sadly this is actual mouse only, may need `pygame._sdl2.touch` or perhaps later versions of pygame support num_buttons 
     click = pygame.mouse.get_pressed()
     if config.holdCount > 30:
       os.system('echo "USER has requested clear DTC Code(s) `date +%Y-%m-%d-%H%M` Zulu" >> ../logs/EVENTS.LOG' )
@@ -303,7 +304,7 @@ while True:
     windowSurface.blit(img, (windowSurface.get_rect().centerx - 105, windowSurface.get_rect().centery + 60))
     # If the settings button has been pressed:
     if (config.settingsFlag):
-      drawText("Codes - Push&Hold2Clear", 0, -110 "readout")
+      drawText("Codes - Push&Hold2Clear", 0, -110, "readout")
       # Print all the DTCs
       ##debug method
       if ecu.dtc or ecu.pending:
