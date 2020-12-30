@@ -3,6 +3,7 @@ import config, time, sys, os
 from threading import Thread
 import obd
 import numpy as np
+import commands
 
 # Globals
 clearDTC = "DTC not cleared"
@@ -112,6 +113,9 @@ class ecuThread(Thread):
       connection = obd.Async(config.elmDev, 115200, "3", fast=False)
     except:
       print "INFO: 404 - Bluetooth or USB may not be connected?"
+      #since splash doesn't come up, it will be handy to at least show the IPaddr for debug
+      cmdStatus, config.piWlan = commands.getstatusoutput("ifconfig wlan0 | grep 'inet ' | awk '{print $2}'")
+      os.system("echo IP ADDRESS is %s" % (config.piWlan))
       config.tapCount = 404
       sys.exit()
 
